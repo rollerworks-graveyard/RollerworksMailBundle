@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the RollerFramework package.
+ * This file is part of the RollerworksMailBundle.
  *
  * (c) Rollerscapes
  *
