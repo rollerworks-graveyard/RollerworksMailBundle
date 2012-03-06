@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the RollerworksMailBundle.
  *
@@ -29,35 +30,35 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 	 *
 	 * @var \Symfony\Component\Templating\EngineInterface
 	 */
-	protected $_oTemplate = null;
+	protected $templateEngine = null;
 
 	/**
 	 * Template files to use
 	 *
 	 * @var array
 	 */
-	protected $_aTemplates = array();
+	protected $aTemplatesFiles = array();
 
 	/**
 	 * The replacement map
 	 *
 	 * @var \Swift_Plugins_Decorator_Replacements|Array $pmReplacements
 	 */
-	protected $_mReplacements;
+	protected $replacements;
 
 	/**
 	 * The original subject of the message, before replacements
 	 *
 	 * @var string
 	 */
-	protected $_sOriginalSubject;
+	protected $originalSubject;
 
 	/**
 	 * The Message that was last replaced
 	 *
 	 * @var \Swift_Mime_Message
 	 */
-	protected $_oLastMessage;
+	protected $lastMessage;
 
 	/**
 	 * Remember the init state.
@@ -65,14 +66,14 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 	 *
 	 * @var boolean
 	 */
-	protected $_bInit = false;
+	protected $bInit = false;
 
 	/**
 	 * Instance of HTM2Text Filter.
 	 *
 	 * @var \RF\Filter\cHTML2Text
 	 */
-	protected $_oHTML2Text = null;
+	protected $HTML2Text = null;
 
 	/**
 	 * Create a new TemplateDecoratorPlugin with $pmReplacements.
@@ -136,21 +137,21 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 			throw new InvalidArgumentException('$paTemplates must contain either html and/or text');
 		}
 		elseif (isset($paTemplates[ 'html' ]) && !isset($paTemplates[ 'text' ])) {
-			$this->_oHTML2Text = new Html2Text();
+			$this->HTML2Text = new Html2Text();
 		}
 
 		if (empty($paTemplates[ 'text' ]) || $paTemplates[ 'text' ] === false)	{
 			unset($paTemplates[ 'text' ]);
 		}
 
-		$this->_oTemplate	= $poTemplate;
-		$this->_aTemplates	= $paTemplates;
+		$this->templateEngine	= $poTemplate;
+		$this->aTemplatesFiles	= $paTemplates;
 
 		if (!($pmReplacements instanceof \Swift_Plugins_Decorator_Replacements)) {
-			$this->_mReplacements = (array)$pmReplacements;
+			$this->replacements = (array)$pmReplacements;
 		}
 		else {
-			$this->_mReplacements = $pmReplacements;
+			$this->replacements = $pmReplacements;
 		}
 	}
 
@@ -161,7 +162,7 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 	 */
 	public function isTextOnly()
 	{
-		return (!isset($this->_aTemplates[ 'html' ]) && isset($this->_aTemplates[ 'text' ]));
+		return (!isset($this->aTemplatesFiles[ 'html' ]) && isset($this->aTemplatesFiles[ 'text' ]));
 	}
 
 	/**
@@ -184,35 +185,33 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 
 		if ($aReplacements = $this->getReplacementsFor($aAddress))
 		{
-			if ( isset( $aReplacements['_subject'] ) )
-			{
+			if (isset($aReplacements[ '_subject' ])) {
 				$aSubSearch  = array_keys($aReplacements[ '_subject' ]);
 				$aSubReplace = array_values($aReplacements[ '_subject' ]);
 
-				$sSubject 			= $oMessage->getSubject();
-				$sSubjectReplaced	= str_replace($aSubSearch, $aSubReplace, $sSubject);
+				$sSubject         = $oMessage->getSubject();
+				$sSubjectReplaced = str_replace($aSubSearch, $aSubReplace, $sSubject);
 
-				if ($sSubject != $sSubjectReplaced)	{
-					$this->_sOriginalSubject = $sSubject;
+				if ($sSubject != $sSubjectReplaced) {
+					$this->originalSubject = $sSubject;
 					$oMessage->setSubject($sSubjectReplaced);
 				}
 			}
 
 			// Text-only
-			if (!isset($this->_aTemplates[ 'html' ]) && isset($this->_aTemplates[ 'text' ])) {
-				$sMessageBodyText = $this->_oTemplate->render( $this->_aTemplates[ 'text' ], $aReplacements );
+			if (!isset($this->aTemplatesFiles[ 'html' ]) && isset($this->aTemplatesFiles[ 'text' ])) {
+				$sMessageBodyText = $this->templateEngine->render( $this->aTemplatesFiles[ 'text' ], $aReplacements );
 				$oMessage->setBody($sMessageBodyText, 'text/plain');
 			}
-			else
-			{
-				$sMessageBodyHTML = $this->_oTemplate->render($this->_aTemplates[ 'html' ], $aReplacements);
+			else {
+				$sMessageBodyHTML = $this->templateEngine->render($this->aTemplatesFiles[ 'html' ], $aReplacements);
 
-				if (isset($this->_aTemplates[ 'text' ])) {
-					$sMessageBodyText = $this->_oTemplate->render($this->_aTemplates[ 'text' ], $aReplacements);
+				if (isset($this->aTemplatesFiles[ 'text' ])) {
+					$sMessageBodyText = $this->templateEngine->render($this->aTemplatesFiles[ 'text' ], $aReplacements);
 				}
-				elseif ($this->_oHTML2Text !== null) {
-					$this->_oHTML2Text->setHTML($sMessageBodyHTML);
-					$sMessageBodyText = $this->_oHTML2Text->getText();
+				elseif ($this->HTML2Text !== null) {
+					$this->HTML2Text->setHTML($sMessageBodyHTML);
+					$sMessageBodyText = $this->HTML2Text->getText();
 				}
 
 				// Text is always the primary one
@@ -224,21 +223,20 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 				if (!isset($sMessageBodyText))	{
 					$oMessage->setBody($sMessageBodyHTML, 'text/html');
 				}
-				elseif ($this->_bInit === false) {
+				elseif ($this->bInit === false) {
 					$oMessage->addPart($sMessageBodyHTML, 'text/html');
 
-					$this->_bInit = true;
+					$this->bInit = true;
 				}
-				else
-				{
+				else {
 					$children = (array)$oMessage->getChildren();
 
 					/**
 					 * @var $oChild \Swift_Mime_MimeEntity
 					 */
-					foreach ($children as $oChild)	{
+					foreach ($children as $oChild) {
 						// We are only interested in the 'alternative' HTML version (not the attached ones)
-						if ('text/html' === $oChild->getContentType() && $oChild->getNestingLevel() === \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE)	{
+						if ('text/html' === $oChild->getContentType() && $oChild->getNestingLevel() === \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE) {
 							$sBody = $oChild->getBody();
 
 							if ($sBody != $sMessageBodyHTML) {
@@ -249,7 +247,7 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 				}
 			}
 
-			$this->_oLastMessage = $oMessage;
+			$this->lastMessage = $oMessage;
 		}
 	}
 
@@ -277,11 +275,11 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 	 */
 	public function getReplacementsFor($psAddress)
 	{
-		if ($this->_mReplacements instanceof \Swift_Plugins_Decorator_Replacements) {
-			return $this->_mReplacements->getReplacementsFor($psAddress);
+		if ($this->replacements instanceof \Swift_Plugins_Decorator_Replacements) {
+			return $this->replacements->getReplacementsFor($psAddress);
 		}
 		else {
-			return isset($this->_mReplacements[ $psAddress ]) ? $this->_mReplacements[ $psAddress ] : null;
+			return isset($this->replacements[ $psAddress ]) ? $this->replacements[ $psAddress ] : null;
 		}
 	}
 
@@ -293,13 +291,13 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
 	 */
 	protected function _restoreMessage(\Swift_Mime_Message $oMessage)
 	{
-		if ($this->_oLastMessage === $oMessage)	{
-			if (isset($this->_sOriginalSubject)) {
-				$oMessage->setSubject($this->_sOriginalSubject);
-				$this->_sOriginalSubject = null;
+		if ($this->lastMessage === $oMessage)	{
+			if (isset($this->originalSubject)) {
+				$oMessage->setSubject($this->originalSubject);
+				$this->originalSubject = null;
 			}
 
-			$this->_oLastMessage = null;
+			$this->lastMessage = null;
 		}
 	}
 }

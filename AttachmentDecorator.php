@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the RollerworksMailBundle.
  *
@@ -69,8 +70,8 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	 */
 	public function __construct($pmReplacements)
 	{
-		if (! ($pmReplacements instanceof Swift_Plugins_Decorator_Replacements)) {
-			$this->_mReplacements = ( array )$pmReplacements;
+		if (!($pmReplacements instanceof Swift_Plugins_Decorator_Replacements)) {
+			$this->_mReplacements = (array) $pmReplacements;
 		}
 		else {
 			$this->_mReplacements = $pmReplacements;
@@ -88,23 +89,17 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	 */
 	public function beforeSendPerformed(\Swift_Events_SendEvent $poSendEvent)
 	{
-		/**
-		 * @var \Swift_Message $oMessage
-		 */
+		/** @var \Swift_Message $oMessage */
 		$oMessage = $poSendEvent->getMessage();
-		//$oMessage	= new \Swift_Message( );
 
 		$this->_restoreMessage($oMessage);
 
 		$aTo      = array_keys($oMessage->getTo());
 		$aAddress = array_shift($aTo);
 
-		if ($aReplacements = $this->getReplacementsFor($aAddress))
-		{
-			foreach ($aReplacements as $mAttachment)
-			{
-				if (is_array($mAttachment))
-				{
+		if ($aReplacements = $this->getReplacementsFor($aAddress)) {
+			foreach ($aReplacements as $mAttachment) {
+				if (is_array($mAttachment)) {
 					if (! isset($mAttachment[ 'type' ])) {
 						$mAttachment[ 'type' ] = null;
 					}
@@ -140,7 +135,7 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	 *
 	 * @return \Swift_Attachment[]
 	 */
-	public function getAttachments( )
+	public function getAttachments()
 	{
 		return $this->_aAttachments ;
 	}
@@ -177,7 +172,7 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	protected function _restoreMessage(\Swift_Mime_Message $poMessage)
 	{
 		if (count($this->_aAttachments) > 0) {
-			foreach ($this->_aAttachments as $oAttachment)	{
+			foreach ($this->_aAttachments as $oAttachment) {
 				$poMessage->detach($oAttachment);
 			}
 

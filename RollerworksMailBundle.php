@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the RollerworksMailBundle.
  *
@@ -10,7 +11,6 @@
  * @link    http://projects.rollerscapes.net/RollerFramework
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  */
-
 
 namespace Rollerworks\MailBundle;
 
