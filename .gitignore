@@ -38,6 +38,7 @@ dwsync.xml
 intermediate
 publish
 .idea
+
 /clover.xml
 /phpunit.xml
 /Tests/TwigCache

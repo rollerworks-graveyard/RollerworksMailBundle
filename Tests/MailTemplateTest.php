@@ -26,398 +26,361 @@ use \Swift_MailTransport, \Swift_Mailer, \Swift_Events_SendEvent, \Swift_Message
 
 class MailTemplateTest extends \PHPUnit_Framework_TestCase
 {
-	function testSimpleReplace()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+    function testSimpleReplace()
+    {
+        $templating = $this->getTwigInstance();
 
-		$transport = Swift_MailTransport::newInstance();
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('john@doe.com' => 'John Doe'))
-			->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
+                              'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig' ));
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John', 'sGender' => 'Sir'),
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet', 'sGender' => 'Heer'));
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('html' => 'TestMsg1.twig' ));
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-				->getMessage()
-				->setTo($sEmail);
-
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
-
-			$oMessage = $oSendEvent->getMessage();
-			$this->assertEquals('Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',
+            $message = $sendEvent->getMessage();
+            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
 
 Dit is een testbericht.
 
 This an test message.
 
-Rollerscapes', trim($oMessage->getBody()));
+Rollerscapes', trim($message->getBody()));
 
-			$children = (array) $message->getChildren();
+            $children = (array) $message->getChildren();
 
-			foreach ($children as $child) {
-				if ('text/html' == $child->getContentType()) {
-					$this->assertEquals('<p>Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
-				}
-			}
+            foreach ($children as $child) {
+                if ('text/html' == $child->getContentType()) {
+                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
+                }
+            }
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-	function testHTMLAndText()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+    function testHTMLAndText()
+    {
+        $templating = $this->getTwigInstance();
 
-		$transport = Swift_MailTransport::newInstance();
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('john@doe.com' => 'John Doe'))
-			->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
+                              'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => 'TestMsg1.txt.twig' ));
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John',  'sGender' => 'Sir'),
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet',  'sGender' => 'Heer'));
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('html' => 'TestMsg1.twig', 'text' => 'TestMsg1.txt.twig' ));
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-				->getMessage()
-				->setTo($sEmail);
-
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
-
-			$oMessage = $oSendEvent->getMessage();
-			$this->assertEquals('Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',
+            $message = $sendEvent->getMessage();
+            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
 
 Dit is een testbericht.
 
 This an test message.
-Rollerscapes-', trim($oMessage->getBody()));
+Rollerscapes-', trim($message->getBody()));
 
-			$children = (array) $message->getChildren();
+            $children = (array) $message->getChildren();
 
-			foreach ($children as $child) {
-				if ('text/html' == $child->getContentType()) {
-					$this->assertEquals('<p>Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
-				}
-			}
+            foreach ($children as $child) {
+                if ('text/html' == $child->getContentType()) {
+                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
+                }
+            }
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-	function testHTMLOnly()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+    function testHTMLOnly()
+    {
+        $templating = $this->getTwigInstance();
 
-		$transport = Swift_MailTransport::newInstance();
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('john@doe.com' => 'John Doe'))
-			->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
+                              'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => false ));
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John',  'sGender' => 'Sir'),
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet',  'sGender' => 'Heer'));
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('html' => 'TestMsg1.twig', 'text' => false ));
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-				->getMessage()
-				->setTo($sEmail);
+            $message = $sendEvent->getMessage();
 
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
+            $this->assertEquals('text/html', $message->getContentType());
+            $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', trim($message->getBody()));
 
-			$oMessage = $oSendEvent->getMessage();
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-			$this->assertEquals('text/html', $oMessage->getContentType());
-			$this->assertEquals('<p>Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', trim($oMessage->getBody()));
+    function testSubjectReplace()
+    {
+        $templating = $this->getTwigInstance();
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Message for {name}')
+            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-	function testSubjectReplace()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'   => array('name'     => 'John',  'gender'   => 'Sir',
+                                                                 '_subject' => array('{name}' => 'SJohn')),
+                              'webmaster@example.com'   => array('name'     => 'Piet',  'gender'   => 'Heer',
+                                                                 '_subject' => array('{name}' => 'SPiet')));
 
-		$transport = Swift_MailTransport::newInstance();
+        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig' ));
 
-		$message = Swift_Message::newInstance('Message for {name}')
-			->setFrom(array('john@doe.com' => 'John Doe'))
-			->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'  => 'John', 'sGender'  => 'Sir',
-																  '_subject' => array('{name}' => 'SJohn')),
-							   'webmaster@google.nl'	 => array('sName'  => 'Piet', 'sGender'  => 'Heer',
-																  '_subject' => array('{name}' => 'SPiet')));
+            $message = $sendEvent->getMessage();
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('html' => 'TestMsg1.twig' ));
-
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-				->getMessage()
-				->setTo($sEmail);
-
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
-
-			$oMessage = $oSendEvent->getMessage();
-
-			$this->assertEquals('Message for ' . $aReplacements[ '_subject' ][ '{name}' ], $oMessage->getSubject());
-			$this->assertEquals('Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',
+            $this->assertEquals('Message for ' . $replacements['_subject']['{name}'], $message->getSubject());
+            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
 
 Dit is een testbericht.
 
 This an test message.
 
-Rollerscapes', trim($oMessage->getBody()));
+Rollerscapes', trim($message->getBody()));
 
-			$children = (array)$message->getChildren();
+            $children = (array) $message->getChildren();
 
-			foreach ($children as $child) {
-				if ('text/html' == $child->getContentType()) {
-					$this->assertEquals('<p>Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
-				}
-			}
+            foreach ($children as $child) {
+                if ('text/html' == $child->getContentType()) {
+                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
+                }
+            }
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-	function testReplaceWithDate()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+    function testReplaceWithDate()
+    {
+        $templating = $this->getTwigInstance();
 
-		$transport = Swift_MailTransport::newInstance();
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('john@doe.com' => 'John Doe'))
-			->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
+                                                                   'gender' => 'Sir',
+                                                                   'date'   => '2010-08-25 15:28',
+                                                                   'lang'   => 'en',
+                                                                   'date2'  => 'Wednesday, August 25, 2010 3:28 PM'),
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+                              'webmaster@example.com'     => array('name'   => 'Piet',
+                                                                   'gender' => 'Heer',
+                                                                   'date'   => '2010-08-25 14:28',
+                                                                   'lang'   => 'nl',
+                                                                   'date2'  => 'woensdag 25 augustus 2010 14:28'));
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John',
-																  'sGender' => 'Sir',
-																  'sDate'   => '2010-08-25 15:28',
-																  'sLang'   => 'en',
-																  'sDate2'  => 'Wednesday, August 25, 2010 3:28 PM'),
+        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg2.twig' ));
 
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet',
-																  'sGender' => 'Heer',
-																  'sDate'   => '2010-08-25 14:28',
-																  'sLang'   => 'nl',
-																  'sDate2'  => 'woensdag 25 augustus 2010 14:28'));
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('html' => 'TestMsg2.twig' ));
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-				->getMessage()
-				->setTo($sEmail);
+            $message = $sendEvent->getMessage();
 
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
+            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
 
-			$oMessage = $oSendEvent->getMessage();
+Currentdate: ' . $replacements['date2'] . '', $message->getBody());
 
-			$this->assertEquals('Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',
+            $children = (array) $message->getChildren();
 
-Currentdate: ' . $aReplacements[ 'sDate2' ] . '', $oMessage->getBody());
+            foreach ($children as $child) {
+                if ('text/html' == $child->getContentType()) {
+                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Currentdate: ' . $replacements['date2'] . '</p>', $child->getBody());
+                }
+            }
 
-			$children = (array)$message->getChildren();
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-			foreach ($children as $child) {
-				if ('text/html' == $child->getContentType()) {
-					$this->assertEquals('<p>Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',</p><p>Currentdate: ' . $aReplacements[ 'sDate2' ] . '</p>', $child->getBody());
-				}
-			}
+    function testOnlyText()
+    {
+        $templating = $this->getTwigInstance();
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-	function testOnlyText()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
+                                                                   'gender' => 'Sir',
+                                                                   'date'   => '2010-08-25 15:28',
+                                                                   'lang'   => 'en',
+                                                                   'date2'  => 'Wednesday, August 25, 2010 3:28:00 PM Central European Summer Time'),
 
-		$transport = Swift_MailTransport::newInstance();
+                              'webmaster@example.com'     => array('name'   => 'Piet',
+                                                                   'gender' => 'Heer',
+                                                                   'date'   => '2010-08-25 14:28',
+                                                                   'lang'   => 'nl',
+                                                                   'date2'  => 'woensdag 25 augustus 2010 14:28:00 Midden-Europese zomertijd'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('john@doe.com' => 'John Doe'))
-			->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $mailDecorator = new Template($templating, $replacements, array('text' => 'TestMsg3.twig' ));
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+        $this->assertTrue( $mailDecorator->isTextOnly() );
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John',
-																  'sGender' => 'Sir',
-																  'sDate'   => '2010-08-25 15:28',
-																  'sLang'   => 'en',
-																  'sDate2'  => 'Wednesday, August 25, 2010 3:28:00 PM Central European Summer Time'),
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet',
-																  'sGender' => 'Heer',
-																  'sDate'   => '2010-08-25 14:28',
-																  'sLang'   => 'nl',
-																  'sDate2'  => 'woensdag 25 augustus 2010 14:28:00 Midden-Europese zomertijd')
-		);
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('text' => 'TestMsg3.twig' ));
+            $message = $sendEvent->getMessage();
 
-		$this->assertTrue( $oMailTemplate->isTextOnly() );
+            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-				->getMessage()
-				->setTo($sEmail);
+Currentdate: ' . $replacements['date2'] . '', str_replace("\r", '', trim($message->getBody())));
 
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
+            $children = (array) $message->getChildren();
 
-			$oMessage = $oSendEvent->getMessage();
+            foreach ($children as $child) {
+                if ('text/plain' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
+                    $this->fail('This must not exist.');
+                }
+            }
 
-			$this->assertEquals('Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-Currentdate: ' . $aReplacements[ 'sDate2' ] . '', str_replace("\r", '', trim($oMessage->getBody())));
+    function testAttachedHTML()
+    {
+        $templating = $this->getTwigInstance();
 
-			$children = (array)$message->getChildren();
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+                ->setFrom(array('john@doe.com' => 'John Doe'))
+                ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-			foreach ($children as $child) {
-				if ('text/plain' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
-					$this->fail('This must not exist.');
-				}
-			}
+        $message->attach(Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
+                                                                   'gender' => 'Sir',
+                                                                   'date'   => '2010-08-25 15:28',
+                                                                   'lang'   => 'en',
+                                                                   'date2'  => 'Wednesday, August 25, 2010 3:28 PM'),
 
-	function testAttachedHTML()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+                              'webmaster@example.com'     => array('name'   => 'Piet',
+                                                                   'gender' => 'Heer',
+                                                                   'date'   => '2010-08-25 14:28',
+                                                                   'lang'   => 'nl',
+                                                                   'date2'  => 'woensdag 25 augustus 2010 14:28'));
 
-		$transport = Swift_MailTransport::newInstance();
+        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg2.twig' ));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-				->setFrom(array('john@doe.com' => 'John Doe'))
-				->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        foreach ($replacements as $sEmail => $replacements) {
+            $sendEvent->getMessage()->setTo($sEmail);
 
-		$message->attach(Swift_Attachment::fromPath(__DIR__ . '/Files/TestMsg2.twig', 'text/html'));
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+            $message = $sendEvent->getMessage();
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John',
-																  'sGender' => 'Sir',
-																  'sDate'   => '2010-08-25 15:28',
-																  'sLang'   => 'en',
-																  'sDate2'  => 'Wednesday, August 25, 2010 3:28 PM'),
+            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
 
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet',
-																  'sGender' => 'Heer',
-																  'sDate'   => '2010-08-25 14:28',
-																  'sLang'   => 'nl',
-																  'sDate2'  => 'woensdag 25 augustus 2010 14:28')
-		);
+Currentdate: ' . $replacements['date2'] . '', $message->getBody());
 
-		$oMailTemplate = new Template($oTemplateHandler, $aReplacements, array('html' => 'TestMsg2.twig' ));
+            $children = (array) $message->getChildren();
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent
-					->getMessage()
-					->setTo($sEmail);
+            foreach ($children as $child) {
+                if ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
+                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Currentdate: ' . $replacements['date2'] . '</p>', $child->getBody());
+                }
+                elseif ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $headers = $child->getHeaders();
 
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
-
-			$oMessage = $oSendEvent->getMessage();
-
-			$this->assertEquals('Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',
-
-Currentdate: ' . $aReplacements[ 'sDate2' ] . '', $oMessage->getBody());
-
-			$children = (array)$message->getChildren();
-
-			foreach ($children as $child)
-			{
-				if ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
-					$this->assertEquals('<p>Geachte ' . $aReplacements[ 'sGender' ] . ' ' . $aReplacements[ 'sName' ] . ',</p><p>Currentdate: ' . $aReplacements[ 'sDate2' ] . '</p>', $child->getBody());
-				}
-				elseif ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
-					$oHeaders = $child->getHeaders();
-
-					if ($oHeaders->has('Content-Disposition')) {
-						$sOrig = 'Content-Type: text/html; name=TestMsg2.twig
+                    if ($headers->has('Content-Disposition')) {
+                        $sOrig = 'Content-Type: text/html; name=TestMsg2.twig
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename=TestMsg2.twig
 
-PHA+R2VhY2h0ZSB7eyBzR2VuZGVyIH19IHt7IHNOYW1lIH19LDwvcD48cD5DdXJyZW50ZGF0ZTog
-e3sgc0RhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIHNMYW5nICkgfX08L3A+';
+PHA+R2VhY2h0ZSB7eyBnZW5kZXIgfX0ge3sgbmFtZSB9fSw8L3A+PHA+Q3VycmVudGRhdGU6IHt7
+IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
 
-						// The $sOrig does not have \r (since this file is UNIX encoded)
-						$sChild = str_replace("\r", '', trim($child->toString()));
+                        // The $sOrig does not have \r (since this file is UNIX encoded)
+                        $sChild = str_replace("\r", '', trim($child->toString()));
 
-						$this->assertEquals($sOrig, $sChild);
-					}
-				}
-			}
+                        $this->assertEquals($sOrig, $sChild);
+                    }
+                }
+            }
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-	function testWrongInput()
-	{
-		$oTemplateHandler = $this->getTwigInstance();
+    function testWrongInput()
+    {
+        $templating = $this->getTwigInstance();
 
-		$transport = Swift_MailTransport::newInstance();
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+                ->setFrom(array('john@doe.com' => 'John Doe'))
+                ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-				->setFrom(array('john@doe.com' => 'John Doe'))
-				->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $message->attach(Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
 
-		$message->attach(Swift_Attachment::fromPath(__DIR__ . '/Files/TestMsg2.twig', 'text/html'));
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
+                                                                   'gender' => 'Sir',
+                                                                   'date'   => '2010-08-25 15:28',
+                                                                   'lang'   => 'en',
+                                                                   'date2'  => 'Wednesday, August 25, 2010 3:28 PM'),
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+                              'webmaster@example.com'     => array('name'   => 'Piet',
+                                                                   'gender' => 'Heer',
+                                                                   'date'   => '2010-08-25 14:28',
+                                                                   'lang'   => 'nl',
+                                                                   'date2'  => 'woensdag 25 augustus 2010 14:28'));
 
-		$aReplacements = array('info@rollerscapes.net'   => array('sName'   => 'John',
-																  'sGender' => 'Sir',
-																  'sDate'   => '2010-08-25 15:28',
-																  'sLang'   => 'en',
-																  'sDate2'  => 'Wednesday, August 25, 2010 3:28 PM'),
+        $this->setExpectedException( '\InvalidArgumentException', '$templates must contain either html and/or text');
+        new Template($templating, $replacements, array());
+    }
 
-							   'webmaster@google.nl'	 => array('sName'   => 'Piet',
-																  'sGender' => 'Heer',
-																  'sDate'   => '2010-08-25 14:28',
-																  'sLang'   => 'nl',
-																  'sDate2'  => 'woensdag 25 augustus 2010 14:28')
-		);
+    protected function getTwigInstance()
+    {
+        $config = array('cache' => __DIR__ . '/TwigCache', 'strict_variables' => true);
 
-		$this->setExpectedException( '\InvalidArgumentException', '$paTemplates must contain either html and/or text');
-		new Template($oTemplateHandler, $aReplacements, array());
-	}
+        $loader = new Twig_Loader_Filesystem(array(__DIR__ . '/Fixtures'));
+        $twig   = new Twig_Environment($loader, $config);
 
-	protected function getTwigInstance()
-	{
-		$config = array(
-			'cache' => __DIR__ . '/TwigCache',
-			'strict_variables' => true);
+        $twig->addExtension(new \Twig_Extensions_Extension_Intl());
+        $engine = new TwigEngine($twig);
 
-		$loader = new Twig_Loader_Filesystem(array(__DIR__ . '/Files'));
-
-		$twig   = new Twig_Environment($loader, $config);
-		$twig->addExtension( new \Twig_Extensions_Extension_Intl() );
-
-		$oEngine = new TwigEngine($twig);
-
-		return $oEngine ;
-	}
+        return $engine;
+    }
 }
