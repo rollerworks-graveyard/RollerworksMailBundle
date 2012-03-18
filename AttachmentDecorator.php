@@ -20,25 +20,27 @@ use Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements;
  * Handle e-mail messages attachments using the Decorator pattern.
  *
  * For use with SwiftMailerBundle
+ *
+ * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  */
 class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements
 {
 	/**
 	 * The replacement map
 	 *
-	 * @var \Swift_Plugins_Decorator_Replacements|Array $pmReplacements
+	 * @var \Swift_Plugins_Decorator_Replacements|array
 	 */
-	protected $_mReplacements;
+	protected $replacements;
 
 	/**
 	 * Array containing all the attachments that must be removed.
 	 *
-	 * @var array
+	 * @var \Swift_Attachment[]
 	 */
-	protected $_aAttachments;
+	protected $attachments;
 
 	/**
-	 * Create a new AttachmentDecoratorPlugin with $pmReplacements.
+	 * Create a new AttachmentDecoratorPlugin with $replacements.
 	 *
 	 * The $replacements can either be an associative array,
 	 *  or an implementation of {@see \Swift_Plugins_Decorator_Replacements}.
@@ -64,17 +66,17 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	 * the object should return just the array of replacements for the address
 	 * given to {@see \Swift_Plugins_Decorator_Replacements::getReplacementsFor()}.
 	 *
-	 * @param \Swift_Plugins_Decorator_Replacements|Array    $pmReplacements
+	 * @param \Swift_Plugins_Decorator_Replacements|Array $replacements
 	 *
 	 * @api
 	 */
-	public function __construct($pmReplacements)
+	public function __construct($replacements)
 	{
-		if (!($pmReplacements instanceof Swift_Plugins_Decorator_Replacements)) {
-			$this->_mReplacements = (array) $pmReplacements;
+		if (!($replacements instanceof Swift_Plugins_Decorator_Replacements)) {
+			$this->replacements = (array) $replacements;
 		}
 		else {
-			$this->_mReplacements = $pmReplacements;
+			$this->replacements = $replacements;
 		}
 	}
 
@@ -82,37 +84,33 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	/**
 	 * Invoked immediately before the Message is sent.
 	 *
-	 * @param \Swift_Events_SendEvent $poSendEvent
-	 * @param \Swift_Events_SendEvent $poSendEvent
+	 * @param \Swift_Events_SendEvent $sendEvent
+	 * @param \Swift_Events_SendEvent $sendEvent
 	 *
 	 * @api
 	 */
-	public function beforeSendPerformed(\Swift_Events_SendEvent $poSendEvent)
+	public function beforeSendPerformed(\Swift_Events_SendEvent $sendEvent)
 	{
-		/** @var \Swift_Message $oMessage */
-		$oMessage = $poSendEvent->getMessage();
+		/** @var \Swift_Message $message */
+		$message = $sendEvent->getMessage();
 
-		$this->_restoreMessage($oMessage);
+		$this->restoreMessage($message);
 
-		$aTo      = array_keys($oMessage->getTo());
-		$aAddress = array_shift($aTo);
+		$to      = array_keys($message->getTo());
+		$address = array_shift($to);
 
-		if ($aReplacements = $this->getReplacementsFor($aAddress)) {
-			foreach ($aReplacements as $mAttachment) {
-				if (is_array($mAttachment)) {
-					if (! isset($mAttachment[ 'type' ])) {
-						$mAttachment[ 'type' ] = null;
-					}
+		if ($aReplacements = $this->getReplacementsFor($address)) {
+			foreach ($aReplacements as $attachment) {
+				if (is_array($attachment)) {
+                    if (!isset($attachment['type'])) {
+                        $attachment['type'] = null;
+                    }
 
-					$oAttachment = \Swift_Attachment::newInstance($mAttachment[ 'data' ], $mAttachment[ 'filename' ], $mAttachment[ 'type' ]);
-
-					$this->_aAttachments[ ] = $oAttachment;
-					$oMessage->attach($oAttachment);
+                    $attachment = \Swift_Attachment::newInstance($attachment['data'], $attachment['filename'], $attachment['type']);
 				}
-				else {
-					$this->_aAttachments[ ] = $mAttachment;
-					$oMessage->attach($mAttachment);
-				}
+
+                $this->attachments[] = $attachment;
+                $message->attach($attachment);
 			}
 		}
 	}
@@ -121,11 +119,11 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	/**
 	 * Invoked immediately after the Message is sent.
 	 *
-	 * @param \Swift_Events_SendEvent $poSendEvent
+	 * @param \Swift_Events_SendEvent $sendEvent
 	 */
-	public function sendPerformed(\Swift_Events_SendEvent $poSendEvent)
+	public function sendPerformed(\Swift_Events_SendEvent $sendEvent)
 	{
-		$this->_restoreMessage($poSendEvent->getMessage());
+		$this->restoreMessage($sendEvent->getMessage());
 	}
 
 
@@ -137,7 +135,7 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	 */
 	public function getAttachments()
 	{
-		return $this->_aAttachments ;
+		return $this->attachments;
 	}
 
 
@@ -148,18 +146,18 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	 *
 	 * If no replacements can be found, an empty value (NULL) is returned.
 	 *
-	 * @param string $psAddress
+	 * @param string $address
 	 * @return array
 	 *
 	 * @api
 	 */
-	public function getReplacementsFor($psAddress)
+	public function getReplacementsFor($address)
 	{
-		if ($this->_mReplacements instanceof Swift_Plugins_Decorator_Replacements) {
-			return $this->_mReplacements->getReplacementsFor($psAddress);
+		if ($this->replacements instanceof Swift_Plugins_Decorator_Replacements) {
+			return $this->replacements->getReplacementsFor($address);
 		}
 		else {
-			return isset($this->_mReplacements[ $psAddress ]) ? $this->_mReplacements[ $psAddress ] : null;
+            return isset($this->replacements[$address]) ? $this->replacements[$address] : null;
 		}
 	}
 
@@ -167,16 +165,16 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
 	/**
 	 * Restore a changed message back to its original state
 	 *
-	 * @param \Swift_Mime_Message $poMessage
+	 * @param \Swift_Mime_Message $message
 	 */
-	protected function _restoreMessage(\Swift_Mime_Message $poMessage)
+	protected function restoreMessage(\Swift_Mime_Message $message)
 	{
-		if (count($this->_aAttachments) > 0) {
-			foreach ($this->_aAttachments as $oAttachment) {
-				$poMessage->detach($oAttachment);
+		if (count($this->attachments) > 0) {
+			foreach ($this->attachments as $attachment) {
+				$message->detach($attachment);
 			}
 
-			$this->_aAttachments = array();
+			$this->attachments = array();
 		}
 	}
 }

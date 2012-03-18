@@ -17,228 +17,210 @@ namespace Rollerworks\MailBundle\Tests;
 use Rollerworks\MailBundle\Template;
 use Rollerworks\MailBundle\AttachmentDecorator;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
-use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Bundle\TwigBundle\TwigEngine;
-
-use \Twig_Loader_Filesystem, \Twig_Environment;
-
 use \Swift_MailTransport, \Swift_Mailer, \Swift_Events_SendEvent, \Swift_Message, \Swift_Attachment, \Swift_Mime_MimeEntity;
 
 class AttachmentTest extends \PHPUnit_Framework_TestCase
 {
-	function testSimpleReplace()
-	{
-		$transport = Swift_MailTransport::newInstance();
+    function testSimpleReplace()
+    {
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+                ->setFrom(array('john@doe.com' => 'John Doe'))
+                ->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-				->setFrom(array('john@doe.com' => 'John Doe'))
-				->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $message->setBody('Here is the message itself');
 
-		$message->setBody('Here is the message itself');
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array(
+            'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document',      'Invoice-2011-4342.txt', 'plain/text')),
+            'webmaster@google.nl'    => array(Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-8480.txt', 'plain/text')));
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+        $mailDecorator = new AttachmentDecorator($replacements);
 
-		$aReplacements = array(
-			'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document', 		'Invoice-2011-4342.txt', 'plain/text')),
-			'webmaster@google.nl'	 => array(Swift_Attachment::newInstance('this an none-test document',	'Invoice-2011-8480.txt', 'plain/text')));
+        foreach ($replacements as $email => $replacements) {
+            $sendEvent->getMessage()->setTo($email);
 
-		$oMailTemplate = new AttachmentDecorator($aReplacements);
+            $mailDecorator->beforeSendPerformed($sendEvent);
+            $message = $sendEvent->getMessage();
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent->getMessage()->setTo($sEmail);
+            $this->assertEquals('Here is the message itself', trim($message->getBody()));
 
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
-			$oMessage = $oSendEvent->getMessage();
+            $children = (array) $message->getChildren();
 
-			$this->assertEquals('Here is the message itself', trim($oMessage->getBody()));
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $this->assertEquals($replacements[0], $child);
+                }
+            }
 
-			$children = (array)$message->getChildren();
+            $mailDecorator->sendPerformed($sendEvent);
+        }
+    }
 
-			foreach ($children as $child) {
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED) {
-					$this->assertEquals($aReplacements[ 0 ], $child);
-				}
-			}
 
-			$oMailTemplate->sendPerformed($oSendEvent);
-		}
-	}
+    function testKeepOriginal()
+    {
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+                ->setFrom(array('john@doe.com' => 'John Doe'))
+                ->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
 
+        $message->setBody('Here is the message itself');
 
-	function testKeepOriginal()
-	{
-		$transport = Swift_MailTransport::newInstance();
+        $attachment = Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-848.txt', 'plain/text');
+        $message->attach($attachment);
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-				->setFrom(array('john@doe.com' => 'John Doe'))
-				->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array(
+            'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document',      'Invoice-2011-4342.txt', 'plain/text')),
+            'webmaster@google.nl'    => array(Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-8480.txt', 'plain/text')));
 
-		$message->setBody('Here is the message itself');
+        $mailDecorator = new AttachmentDecorator($replacements);
 
-		$oLooseAttachment = Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-848.txt', 'plain/text');
+        foreach ($replacements as $email => $replacements) {
+            $sendEvent->getMessage()->setTo($email);
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		$message->attach($oLooseAttachment);
+            $message = $sendEvent->getMessage();
+            $this->assertEquals('Here is the message itself', trim($message->getBody()));
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+            $children = (array) $message->getChildren();
 
-		$aReplacements = array(
-			'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document',		'Invoice-2011-4342.txt', 'plain/text')),
-			'webmaster@google.nl'	 => array(Swift_Attachment::newInstance('this an none-test document',	'Invoice-2011-8480.txt', 'plain/text')));
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel() && 'Invoice-2011-848.txt' == $child->getFilename()) {
+                    continue;
+                }
 
-		$oMailTemplate = new AttachmentDecorator($aReplacements);
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $this->assertEquals($replacements[0], $child);
+                }
+            }
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent->getMessage()->setTo($sEmail);
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
+            $mailDecorator->sendPerformed($sendEvent);
 
-			$oMessage = $oSendEvent->getMessage();
-			$this->assertEquals('Here is the message itself', trim($oMessage->getBody()));
+            $children = (array) $message->getChildren();
 
-			$children = (array) $message->getChildren();
+            // Check to make sure the original Attachment is still there
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $this->assertEquals($attachment->toString(), $child->toString());
+                }
+            }
+        }
+    }
 
-			foreach ($children as $child) {
-				if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel() && 'Invoice-2011-848.txt' == $child->getFilename()) {
-					continue;
-				}
 
-				if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
-					$this->assertEquals($aReplacements[ 0 ], $child);
-				}
-			}
+    function testMultiple()
+    {
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+                ->setFrom(array('john@doe.com' => 'John Doe'))
+                ->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
 
-			$oMailTemplate->sendPerformed($oSendEvent);
+        $message->setBody('Here is the message itself');
 
-			$children = (array)$message->getChildren();
+        $oLooseAttachment = Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-848.txt', 'plain/text');
+        $message->attach($oLooseAttachment);
 
-			// Check to make sure the original Attachment is still there
-			foreach ($children as $child) {
-				if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
-					$this->assertEquals($oLooseAttachment->toString(), $child->toString());
-				}
-			}
-		}
-	}
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $replacements = array(
+            'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document', 'Invoice-2011-4342.txt', 'plain/text')),
+            'webmaster@google.nl'    => array(
+                Swift_Attachment::newInstance('this an none-test document',  'Invoice-2011-8480.txt', 'plain/text'),
+                Swift_Attachment::newInstance('this an none-test2 document', 'Invoice-2011-8580.txt', 'plain/text')));
 
+        $mailDecorator = new AttachmentDecorator($replacements);
 
-	function testMultiple()
-	{
-		$transport = Swift_MailTransport::newInstance();
+        foreach ($replacements as $email => $replacements) {
+            $sendEvent->getMessage()->setTo($email);
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-				->setFrom(array('john@doe.com' => 'John Doe'))
-				->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+            $message = $sendEvent->getMessage();
+            $this->assertEquals('Here is the message itself', trim($message->getBody()));
 
-		$message->setBody('Here is the message itself');
+            $children = (array) $message->getChildren();
 
-		$oLooseAttachment = Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-848.txt', 'plain/text');
-		$message->attach($oLooseAttachment);
+            $attachments = array();
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel() && 'Invoice-2011-848.txt' == $child->getFilename()) {
+                    continue;
+                }
 
-		$aReplacements = array(
-			'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document', 		'Invoice-2011-4342.txt', 'plain/text')),
-			'webmaster@google.nl'	 => array(
-				Swift_Attachment::newInstance('this an none-test document',	'Invoice-2011-8480.txt', 'plain/text'),
-				Swift_Attachment::newInstance('this an none-test2 document', 'Invoice-2011-8580.txt', 'plain/text')));
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $attachments[] = $child;
+                }
+            }
 
-		$oMailTemplate = new AttachmentDecorator($aReplacements);
+            $this->assertEquals($attachments, $attachments);
 
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent->getMessage()->setTo($sEmail);
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
+            $mailDecorator->sendPerformed($sendEvent);
 
-			$oMessage = $oSendEvent->getMessage();
-			$this->assertEquals('Here is the message itself', trim($oMessage->getBody()));
+            $children = (array) $message->getChildren();
 
-			$children = (array)$message->getChildren();
+            // Check to make sure the original Attachment is still there
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $this->assertEquals($oLooseAttachment->toString(), $child->toString());
+                }
+            }
+        }
+    }
 
-			$aAttachments = array();
 
-			foreach ($children as $child) {
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED && $child->getFilename() == 'Invoice-2011-848.txt') {
-					continue;
-				}
+    function testMultiArray()
+    {
+        $transport = Swift_MailTransport::newInstance();
+        $message = Swift_Message::newInstance('Wonderful Subject')
+                ->setFrom(array('john@doe.com' => 'John Doe'))
+                ->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
 
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED) {
-					$aAttachments[ ] = $child;
-				}
-			}
+        $message->setBody('Here is the message itself');
 
-			$this->assertEquals($aAttachments, $aAttachments);
+        $oLooseAttachment = Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-848.txt', 'plain/text');
+        $message->attach($oLooseAttachment);
 
-			$oMailTemplate->sendPerformed($oSendEvent);
+        $sendEvent = new Swift_Events_SendEvent($transport, $message);
 
-			$children = (array)$message->getChildren();
+        $replacements = array(
+            'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document',      'Invoice-2011-4342.txt', 'plain/text')),
+             'webmaster@google.nl'   => array(Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-8480.txt', 'plain/text'),
+                 array('data' => 'this an none-test2 document', 'filename' => 'Invoice-2011-8580.txt')));
 
-			// Check to make sure the original Attachment is still there
-			foreach ($children as $child) {
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED) {
-					$this->assertEquals($oLooseAttachment->toString(), $child->toString());
-				}
-			}
-		}
-	}
+        $mailDecorator = new AttachmentDecorator($replacements);
 
+        foreach ($replacements as $email => $replacements) {
+            $sendEvent->getMessage()->setTo($email);
+            $mailDecorator->beforeSendPerformed($sendEvent);
 
-	function testMultiArray()
-	{
-		$transport = Swift_MailTransport::newInstance();
+            $message = $sendEvent->getMessage();
+            $this->assertEquals('Here is the message itself', trim($message->getBody()));
 
-		$mailer = Swift_Mailer::newInstance($transport);
+            $children = (array) $message->getChildren();
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-				->setFrom(array('john@doe.com' => 'John Doe'))
-				->setTo(array('info@rollerscapes.net', 'webmaster@google.nl'));
+            $attachments = array();
 
-		$message->setBody('Here is the message itself');
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel() && 'Invoice-2011-848.txt' == $child->getFilename()) {
+                    continue;
+                }
 
-		$oLooseAttachment = Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-848.txt', 'plain/text');
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $attachments[] = $child;
+                }
+            }
 
-		$message->attach($oLooseAttachment);
+            $this->assertEquals($attachments, $attachments);
+            $mailDecorator->sendPerformed($sendEvent);
 
-		$oSendEvent = new Swift_Events_SendEvent($transport, $message);
+            $children = (array) $message->getChildren();
 
-		$aReplacements = array(
-			'info@rollerscapes.net'  => array(Swift_Attachment::newInstance('this an test document', 'Invoice-2011-4342.txt', 'plain/text')),
-			 'webmaster@google.nl'	 => array(Swift_Attachment::newInstance('this an none-test document', 'Invoice-2011-8480.txt', 'plain/text'),
-				 array('data' => 'this an none-test2 document', 'filename' => 'Invoice-2011-8580.txt')));
-
-		$oMailTemplate = new AttachmentDecorator($aReplacements);
-
-		foreach ($aReplacements as $sEmail => $aReplacements) {
-			$oSendEvent->getMessage()->setTo($sEmail);
-			$oMailTemplate->beforeSendPerformed($oSendEvent);
-
-			$oMessage = $oSendEvent->getMessage();
-			$this->assertEquals('Here is the message itself', trim($oMessage->getBody()));
-
-			$children = (array)$message->getChildren();
-
-			$aAttachments = array();
-
-			foreach ($children as $child) {
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED && $child->getFilename() == 'Invoice-2011-848.txt') {
-					continue;
-				}
-
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED) {
-					$aAttachments[ ] = $child;
-				}
-			}
-
-			$this->assertEquals($aAttachments, $aAttachments);
-			$oMailTemplate->sendPerformed($oSendEvent);
-
-			$children = (array)$message->getChildren();
-
-			// Check to make sure the original Attachment is still there
-			foreach ($children as $child) {
-				if ($child->getNestingLevel() === Swift_Mime_MimeEntity::LEVEL_MIXED) {
-					$this->assertEquals($oLooseAttachment->toString(), $child->toString());
-				}
-			}
-		}
-	}
+            // Check to make sure the original Attachment is still there
+            foreach ($children as $child) {
+                if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                    $this->assertEquals($oLooseAttachment->toString(), $child->toString());
+                }
+            }
+        }
+    }
 }
