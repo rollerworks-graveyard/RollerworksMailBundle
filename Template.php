@@ -65,13 +65,6 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
     protected $isInit = false;
 
     /**
-     * Instance of HTM2Text Filter.
-     *
-     * @var \Rollerworks\MailBundle\Html2Text
-     */
-    protected $Html2Text = null;
-
-    /**
      * Create a new TemplateDecoratorPlugin with $replacements.
      *
      * The $replacements can either be an associative array,
@@ -104,10 +97,12 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
      * __The location is send directly to render(), so the path/location must be correct.__
      *
      * * If the there is **only** one key 'text', the message will be only text.
-     * * If the there is **only** one key 'html', the message will be html
-     *      And the HTML output is converted to plain/text using HTML2Text and added as alternative.
+     * * If the there is **only** one key 'html', the message will be only html
      * * If both the 'html' and 'text' keys are present, they are both used for the correct format respectively.
      * * If the 'text' is either false or empty, only HTML is used.
+     * * You must use at minimum one of the two.
+     *
+     * __And all links/references must be absolute to work properly.__
      *
      * Example:
      * <code>
@@ -116,11 +111,6 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
      *      'text' => 'AcmeHelloBundle:Email:Order.txt.twig'
      *  )
      * </code>
-     *
-     * Converting with HTML2Text is done 'as best as possible', but may not be perfect.
-     * See {@see Rollerworks\MailBundle\Filter\Html2Text} for more information.
-     *
-     * __Don't forget, all links/references must be absolute to work properly.__
      *
      * @param \Symfony\Component\Templating\EngineInterface  $templating
      * @param array|\Swift_Plugins_Decorator_Replacements    $replacements
@@ -131,9 +121,6 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
     {
         if (!isset($templates['html']) && !isset($templates['text'])) {
             throw new InvalidArgumentException('$templates must contain either html and/or text');
-        }
-        elseif (isset($templates['html']) && !isset($templates['text'])) {
-            $this->Html2Text = new Html2Text();
         }
 
         if (empty($templates['text']) || false === $templates['text']) {
@@ -204,10 +191,6 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
                 if (isset($this->templates['text'])) {
                     $messageBodyText = $this->templating->render($this->templates['text'], $replacements);
                 }
-                elseif (null !== $this->Html2Text) {
-                    $this->Html2Text->setHTML($messageBodyHTML);
-                    $messageBodyText = $this->Html2Text->getText();
-                }
 
                 // Text is always the primary one
                 if (isset($messageBodyText)) {
@@ -215,7 +198,7 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
                 }
 
                 // HTML-only
-                if (!isset($messageBodyText))    {
+                if (!isset($messageBodyText)) {
                     $message->setBody($messageBodyHTML, 'text/html');
                 }
                 elseif ($this->isInit === false) {
@@ -232,9 +215,7 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
                     foreach ($children as $child) {
                         // We are only interested in the 'alternative' HTML version (not the attached ones)
                         if ('text/html' === $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
-                            $body = $child->getBody();
-
-                            if ($body != $messageBodyHTML) {
+                            if ($child->getBody() !== $messageBodyHTML) {
                                 $child->setBody($messageBodyHTML);
                             }
                         }
@@ -282,13 +263,13 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
     /**
      * Restore a changed message back to its original state
      *
-     * @param \Swift_Mime_Message $oMessage
+     * @param \Swift_Mime_Message $message
      */
-    protected function restoreMessage(\Swift_Mime_Message $oMessage)
+    protected function restoreMessage(\Swift_Mime_Message $message)
     {
-        if ($this->lastMessage === $oMessage) {
+        if ($this->lastMessage === $message) {
             if (isset($this->originalSubject)) {
-                $oMessage->setSubject($this->originalSubject);
+                $message->setSubject($this->originalSubject);
                 $this->originalSubject = null;
             }
 
