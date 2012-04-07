@@ -54,7 +54,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-
     function testKeepOriginal()
     {
         $transport = Swift_MailTransport::newInstance();
@@ -105,7 +104,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
-
 
     function testMultiple()
     {
@@ -163,7 +161,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
-
 
     function testMultiArray()
     {

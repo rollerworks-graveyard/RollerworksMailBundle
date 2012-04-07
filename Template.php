@@ -201,7 +201,7 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
                 if (!isset($messageBodyText)) {
                     $message->setBody($messageBodyHTML, 'text/html');
                 }
-                elseif ($this->isInit === false) {
+                elseif (false === $this->isInit) {
                     $message->addPart($messageBodyHTML, 'text/html');
 
                     $this->isInit = true;
@@ -258,7 +258,6 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
             return isset($this->replacements[$address]) ? $this->replacements[$address] : null;
         }
     }
-
 
     /**
      * Restore a changed message back to its original state
