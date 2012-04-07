@@ -1,7 +1,7 @@
 ﻿[RollerworksMailBundle](http://projects.rollerscapes.net/RollerFramework/)
 ==================================================
 
-This bundle provides the RollerworksMailBundle, providing Templating and AttachementDecorating for SwiftMailer 
+This bundle provides the RollerworksMailBundle, providing Templating and AttachmentDecorating for SwiftMailer 
 
 ### Template
 
