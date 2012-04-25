@@ -115,6 +115,9 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
      * @param \Symfony\Component\Templating\EngineInterface  $templating
      * @param array|\Swift_Plugins_Decorator_Replacements    $replacements
      * @param array                                          $templates
+     *
+     * @throws \InvalidArgumentException When the template file-names are invalid
+     *
      * @api
      */
     public function __construct(TemplateInterface $templating, $replacements, array $templates)
@@ -141,7 +144,7 @@ class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_R
     /**
      * Get whether the message will is an text/plain only version.
      *
-     * @return bool
+     * @return boolean
      */
     public function isTextOnly()
     {

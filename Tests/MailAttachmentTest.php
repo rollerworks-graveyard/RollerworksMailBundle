@@ -34,7 +34,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
         $mailDecorator = new AttachmentDecorator($replacements);
 
-        foreach ($replacements as $email => $replacements) {
+        foreach ($replacements as $email => $msgReplacements) {
             $sendEvent->getMessage()->setTo($email);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
@@ -46,7 +46,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
             foreach ($children as $child) {
                 if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
-                    $this->assertEquals($replacements[0], $child);
+                    $this->assertEquals($msgReplacements[0], $child);
                 }
             }
 
@@ -73,7 +73,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
         $mailDecorator = new AttachmentDecorator($replacements);
 
-        foreach ($replacements as $email => $replacements) {
+        foreach ($replacements as $email => $msgReplacements) {
             $sendEvent->getMessage()->setTo($email);
             $mailDecorator->beforeSendPerformed($sendEvent);
 
@@ -88,7 +88,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
                 }
 
                 if (Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
-                    $this->assertEquals($replacements[0], $child);
+                    $this->assertEquals($msgReplacements[0], $child);
                 }
             }
 
@@ -126,7 +126,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
         $mailDecorator = new AttachmentDecorator($replacements);
 
-        foreach ($replacements as $email => $replacements) {
+        foreach ($replacements as $email => $msgReplacements) {
             $sendEvent->getMessage()->setTo($email);
             $mailDecorator->beforeSendPerformed($sendEvent);
 
@@ -183,7 +183,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
         $mailDecorator = new AttachmentDecorator($replacements);
 
-        foreach ($replacements as $email => $replacements) {
+        foreach ($replacements as $email => $msgReplacements) {
             $sendEvent->getMessage()->setTo($email);
             $mailDecorator->beforeSendPerformed($sendEvent);
 

@@ -81,13 +81,13 @@ Rollerscapes', trim($message->getBody()));
 
         $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => 'TestMsg1.txt.twig' ));
 
-        foreach ($replacements as $sEmail => $replacements) {
+        foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
 
             $message = $sendEvent->getMessage();
-            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
+            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
 
 Dit is een testbericht.
 
@@ -98,7 +98,7 @@ Rollerscapes-', trim($message->getBody()));
 
             foreach ($children as $child) {
                 if ('text/html' == $child->getContentType()) {
-                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
+                    $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
                 }
             }
 
@@ -121,7 +121,7 @@ Rollerscapes-', trim($message->getBody()));
 
         $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => false ));
 
-        foreach ($replacements as $sEmail => $replacements) {
+        foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
@@ -129,7 +129,7 @@ Rollerscapes-', trim($message->getBody()));
             $message = $sendEvent->getMessage();
 
             $this->assertEquals('text/html', $message->getContentType());
-            $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', trim($message->getBody()));
+            $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', trim($message->getBody()));
 
             $mailDecorator->sendPerformed($sendEvent);
         }
@@ -152,17 +152,17 @@ Rollerscapes-', trim($message->getBody()));
 
         $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig' ));
 
-        foreach ($replacements as $sEmail => $replacements) {
+        foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
 
             $message = $sendEvent->getMessage();
 
-            $this->assertEquals('Message for ' . $replacements['_subject']['{name}'], $message->getSubject());
+            $this->assertEquals('Message for ' . $msgReplacements['_subject']['{name}'], $message->getSubject());
 
             /*
-            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
+            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
 
 Dit is een testbericht.
 
@@ -175,7 +175,7 @@ Rollerscapes', trim($message->getBody()));
 
             foreach ($children as $child) {
                 if ('text/html' == $child->getContentType()) {
-                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
+                    $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
                 }
             }
 
@@ -207,7 +207,7 @@ Rollerscapes', trim($message->getBody()));
 
         $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg2.twig' ));
 
-        foreach ($replacements as $sEmail => $replacements) {
+        foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
@@ -215,16 +215,16 @@ Rollerscapes', trim($message->getBody()));
             $message = $sendEvent->getMessage();
 
             /*
-            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
+            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
 
-Currentdate: ' . $replacements['date2'] . '', $message->getBody());
+Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
             */
 
             $children = (array) $message->getChildren();
 
             foreach ($children as $child) {
                 if ('text/html' == $child->getContentType()) {
-                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Currentdate: ' . $replacements['date2'] . '</p>', $child->getBody());
+                    $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Currentdate: ' . $msgReplacements['date2'] . '</p>', $child->getBody());
                 }
             }
 
@@ -258,16 +258,16 @@ Currentdate: ' . $replacements['date2'] . '', $message->getBody());
 
         $this->assertTrue( $mailDecorator->isTextOnly() );
 
-        foreach ($replacements as $sEmail => $replacements) {
+        foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
 
             $message = $sendEvent->getMessage();
 
-            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
+            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
 
-Currentdate: ' . $replacements['date2'] . '', str_replace("\r", '', trim($message->getBody())));
+Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($message->getBody())));
 
             $children = (array) $message->getChildren();
 
@@ -307,7 +307,7 @@ Currentdate: ' . $replacements['date2'] . '', str_replace("\r", '', trim($messag
 
         $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg2.twig' ));
 
-        foreach ($replacements as $sEmail => $replacements) {
+        foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
@@ -315,16 +315,16 @@ Currentdate: ' . $replacements['date2'] . '', str_replace("\r", '', trim($messag
             $message = $sendEvent->getMessage();
 
             /*
-            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
+            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
 
-Currentdate: ' . $replacements['date2'] . '', $message->getBody());
+Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
             */
 
             $children = (array) $message->getChildren();
 
             foreach ($children as $child) {
                 if ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
-                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Currentdate: ' . $replacements['date2'] . '</p>', $child->getBody());
+                    $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Currentdate: ' . $msgReplacements['date2'] . '</p>', $child->getBody());
                 }
                 elseif ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
                     $headers = $child->getHeaders();
@@ -360,7 +360,7 @@ IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
 
         $message->attach(Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        //$sendEvent = new Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
                                                                    'gender' => 'Sir',
                                                                    'date'   => '2010-08-25 15:28',
@@ -377,6 +377,9 @@ IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
         new Template($templating, $replacements, array());
     }
 
+    /**
+     * @return TwigEngine
+     */
     protected function getTwigInstance()
     {
         $config = array('cache' => __DIR__ . '/TwigCache', 'strict_variables' => true);
