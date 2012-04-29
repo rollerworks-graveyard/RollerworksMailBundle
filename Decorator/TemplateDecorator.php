@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Rollerworks\MailBundle;
+namespace Rollerworks\MailBundle\Decorator;
 
 use Symfony\Component\Templating\EngineInterface as TemplateInterface;
 use \InvalidArgumentException;
@@ -19,7 +19,7 @@ use \InvalidArgumentException;
  *
  * For use with SwiftMailerBundle
  */
-class Template implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_Replacements
+class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_Replacements
 {
     /**
      * Template to use in the sending process

@@ -11,7 +11,7 @@
 
 namespace Rollerworks\MailBundle\Tests;
 
-use Rollerworks\MailBundle\Template;
+use Rollerworks\MailBundle\Decorator\TemplateDecorator;
 
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
@@ -79,7 +79,7 @@ Rollerscapes', trim($message->getBody()));
         $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
                               'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
-        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => 'TestMsg1.txt.twig' ));
+        $mailDecorator = new TemplateDecorator($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => 'TestMsg1.txt.twig' ));
 
         foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
@@ -119,7 +119,7 @@ Rollerscapes-', trim($message->getBody()));
         $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
                               'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
-        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => false ));
+        $mailDecorator = new TemplateDecorator($templating, $replacements, array('html' => 'TestMsg1.twig', 'text' => false ));
 
         foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
@@ -150,7 +150,7 @@ Rollerscapes-', trim($message->getBody()));
                               'webmaster@example.com'   => array('name'     => 'Piet',  'gender'   => 'Heer',
                                                                  '_subject' => array('{name}' => 'SPiet')));
 
-        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig' ));
+        $mailDecorator = new TemplateDecorator($templating, $replacements, array('html' => 'TestMsg1.twig' ));
 
         foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
@@ -205,7 +205,7 @@ Rollerscapes', trim($message->getBody()));
                                                                    'lang'   => 'nl',
                                                                    'date2'  => 'woensdag 25 augustus 2010 14:28'));
 
-        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg2.twig' ));
+        $mailDecorator = new TemplateDecorator($templating, $replacements, array('html' => 'TestMsg2.twig' ));
 
         foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
@@ -254,7 +254,7 @@ Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
                                                                    'lang'   => 'nl',
                                                                    'date2'  => 'woensdag 25 augustus 2010 14:28:00 Midden-Europese zomertijd'));
 
-        $mailDecorator = new Template($templating, $replacements, array('text' => 'TestMsg3.twig' ));
+        $mailDecorator = new TemplateDecorator($templating, $replacements, array('text' => 'TestMsg3.twig' ));
 
         $this->assertTrue( $mailDecorator->isTextOnly() );
 
@@ -305,7 +305,7 @@ Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($mes
                                                                    'lang'   => 'nl',
                                                                    'date2'  => 'woensdag 25 augustus 2010 14:28'));
 
-        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg2.twig' ));
+        $mailDecorator = new TemplateDecorator($templating, $replacements, array('html' => 'TestMsg2.twig' ));
 
         foreach ($replacements as $sEmail => $msgReplacements) {
             $sendEvent->getMessage()->setTo($sEmail);
@@ -374,7 +374,7 @@ IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
                                                                    'date2'  => 'woensdag 25 augustus 2010 14:28'));
 
         $this->setExpectedException( '\InvalidArgumentException', '$templates must contain either html and/or text');
-        new Template($templating, $replacements, array());
+        new TemplateDecorator($templating, $replacements, array());
     }
 
     /**

@@ -11,8 +11,8 @@
 
 namespace Rollerworks\MailBundle\Tests;
 
-use Rollerworks\MailBundle\Template;
-use Rollerworks\MailBundle\AttachmentDecorator;
+use Rollerworks\MailBundle\Decorator\TemplateDecorator;
+use Rollerworks\MailBundle\Decorator\AttachmentDecorator;
 
 use \Swift_MailTransport, \Swift_Mailer, \Swift_Events_SendEvent, \Swift_Message, \Swift_Attachment, \Swift_Mime_MimeEntity;
 

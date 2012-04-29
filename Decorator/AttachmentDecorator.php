@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Rollerworks\MailBundle;
+namespace Rollerworks\MailBundle\Decorator;
 
 use Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements;
 
