@@ -184,37 +184,28 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                 $message->setBody($messageBodyText, 'text/plain');
             }
             else {
-                $messageBodyHTML = $this->templating->render($this->templates['html'], $replacements);
-
+                $messageBodyHtml = $this->templating->render($this->templates['html'], $replacements);
                 if (isset($this->templates['text'])) {
                     $messageBodyText = $this->templating->render($this->templates['text'], $replacements);
                 }
 
-                // Text is always the primary one
+                // HTML is always the primary one
+                // https://github.com/swiftmailer/swiftmailer/issues/184
+                $message->setBody($messageBodyHtml, 'text/html');
+
                 if (isset($messageBodyText)) {
-                    $message->setBody($messageBodyText, 'text/plain');
-                }
-
-                // HTML-only
-                if (!isset($messageBodyText)) {
-                    $message->setBody($messageBodyHTML, 'text/html');
-                }
-                elseif (false === $this->isInit) {
-                    $message->addPart($messageBodyHTML, 'text/html');
-
-                    $this->isInit = true;
-                }
-                else {
-                    $children = (array) $message->getChildren();
-
-                    /**
-                     * @var $child \Swift_Mime_MimeEntity
-                     */
-                    foreach ($children as $child) {
-                        // We are only interested in the 'alternative' HTML version (not the attached ones)
-                        if ('text/html' === $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
-                            if ($child->getBody() !== $messageBodyHTML) {
-                                $child->setBody($messageBodyHTML);
+                    if (false === $this->isInit) {
+                        $message->addPart($messageBodyText, 'text/plain');
+                        $this->isInit = true;
+                    }
+                    else {
+                        /** @var $child \Swift_Mime_MimeEntity */
+                        foreach ($message->getChildren() as $child) {
+                            // We are only interested in the 'alternative' text version (not any attached ones)
+                            if ('text/plain' === $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
+                                if ($child->getBody() !== $messageBodyText) {
+                                    $child->setBody($messageBodyText);
+                                }
                             }
                         }
                     }

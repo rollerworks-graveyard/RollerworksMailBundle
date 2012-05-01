@@ -12,13 +12,6 @@
 namespace Rollerworks\MailBundle\Tests;
 
 use Rollerworks\MailBundle\Decorator\TemplateDecorator;
-
-use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
-
-use \Twig_Loader_Filesystem, \Twig_Environment ;
-
 use \Swift_MailTransport, \Swift_Mailer, \Swift_Events_SendEvent, \Swift_Message, \Swift_Attachment, \Swift_Mime_MimeEntity;
 
 class MailTemplateTest extends \PHPUnit_Framework_TestCase
@@ -87,18 +80,18 @@ Rollerscapes', trim($message->getBody()));
             $mailDecorator->beforeSendPerformed($sendEvent);
 
             $message = $sendEvent->getMessage();
-            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
-
-Dit is een testbericht.
-
-This an test message.
-Rollerscapes-', trim($message->getBody()));
+            $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', trim($message->getBody()));
 
             $children = (array) $message->getChildren();
 
             foreach ($children as $child) {
-                if ('text/html' == $child->getContentType()) {
-                    $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
+                if ('text/plain' == $child->getContentType()) {
+                    $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
+
+Dit is een testbericht.
+
+This an test message.
+Rollerscapes-', $child->getBody());
                 }
             }
 
