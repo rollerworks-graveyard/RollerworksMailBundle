@@ -384,8 +384,8 @@ IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
     {
         $config = array('cache' => __DIR__ . '/TwigCache', 'strict_variables' => true);
 
-        $loader = new Twig_Loader_Filesystem(array(__DIR__ . '/Fixtures'));
-        $twig   = new Twig_Environment($loader, $config);
+        $loader = new \Twig_Loader_Filesystem(array(__DIR__ . '/Fixtures'));
+        $twig   = new \Twig_Environment($loader, $config);
 
         $twig->addExtension(new \Twig_Extensions_Extension_Intl());
         $engine = new TwigEngine($twig);

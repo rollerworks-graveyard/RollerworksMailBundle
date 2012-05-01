@@ -38,7 +38,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
     /**
      * The replacement map
      *
-     * @var \Swift_Plugins_Decorator_Replacements|Array $pmReplacements
+     * @var \Swift_Plugins_Decorator_Replacements|Array
      */
     protected $replacements;
 
@@ -131,14 +131,12 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
         }
 
         $this->templating = $templating;
-        $this->templates  = $templates;
+        $this->templates = $templates;
 
         if (!$replacements instanceof \Swift_Plugins_Decorator_Replacements) {
-            $this->replacements = (array) $replacements;
+            $replacements = (array) $replacements;
         }
-        else {
-            $this->replacements = $replacements;
-        }
+        $this->replacements = $replacements;
     }
 
     /**
@@ -148,7 +146,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
      */
     public function isTextOnly()
     {
-        return (!isset($this->templates['html']) && isset($this->templates['text']));
+        return !isset($this->templates['html']) && isset($this->templates['text']);
     }
 
     /**
@@ -159,22 +157,19 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
      */
     public function beforeSendPerformed(\Swift_Events_SendEvent $sendEvent)
     {
-        /**
-         * @var \Swift_Mime_Message $message
-         */
+        /** @var \Swift_Message $message */
         $message = $sendEvent->getMessage();
-
         $this->restoreMessage($message);
 
-        $to      = array_keys($message->getTo());
+        $to = array_keys($message->getTo());
         $address = array_shift($to);
 
         if (($replacements = $this->getReplacementsFor($address))) {
             if (isset($replacements['_subject'])) {
-                $subjectSearch  = array_keys($replacements['_subject']);
+                $subjectSearch = array_keys($replacements['_subject']);
                 $subjectReplace = array_values($replacements['_subject']);
 
-                $subject         = $message->getSubject();
+                $subject = $message->getSubject();
                 $subjectReplaced = str_replace($subjectSearch, $subjectReplace, $subject);
 
                 if ($subjectReplaced !== $subject) {
@@ -225,11 +220,9 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                     }
                 }
             }
-
             $this->lastMessage = $message;
         }
     }
-
 
     /**
      * Invoked immediately after the Message is sent.
@@ -240,7 +233,6 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
     {
         $this->restoreMessage($sendEvent->getMessage());
     }
-
 
     /**
      * Find a map of replacements for the address.
@@ -274,7 +266,6 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                 $message->setSubject($this->originalSubject);
                 $this->originalSubject = null;
             }
-
             $this->lastMessage = null;
         }
     }

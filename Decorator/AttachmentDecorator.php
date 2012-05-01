@@ -70,11 +70,9 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
     public function __construct($replacements)
     {
         if (!$replacements instanceof Swift_Plugins_Decorator_Replacements) {
-            $this->replacements = (array) $replacements;
+            $replacements = (array) $replacements;
         }
-        else {
-            $this->replacements = $replacements;
-        }
+        $this->replacements = $replacements;
     }
 
 
@@ -90,22 +88,19 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
     {
         /** @var \Swift_Message $message */
         $message = $sendEvent->getMessage();
-
         $this->restoreMessage($message);
 
-        $to      = array_keys($message->getTo());
+        $to = array_keys($message->getTo());
         $address = array_shift($to);
 
-        if ($aReplacements = $this->getReplacementsFor($address)) {
-            foreach ($aReplacements as $attachment) {
+        if ($replacements = $this->getReplacementsFor($address)) {
+            foreach ($replacements as $attachment) {
                 if (is_array($attachment)) {
                     if (!isset($attachment['type'])) {
                         $attachment['type'] = null;
                     }
-
                     $attachment = \Swift_Attachment::newInstance($attachment['data'], $attachment['filename'], $attachment['type']);
                 }
-
                 $this->attachments[] = $attachment;
                 $message->attach($attachment);
             }
@@ -169,7 +164,6 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
             foreach ($this->attachments as $attachment) {
                 $message->detach($attachment);
             }
-
             $this->attachments = array();
         }
     }
