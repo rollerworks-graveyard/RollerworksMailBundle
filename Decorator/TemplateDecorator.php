@@ -36,9 +36,9 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
     protected $templates = array();
 
     /**
-     * The replacement map
+     * The replacements map
      *
-     * @var \Swift_Plugins_Decorator_Replacements|Array
+     * @var \Swift_Plugins_Decorator_Replacements|array
      */
     protected $replacements;
 
@@ -58,7 +58,8 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
 
     /**
      * Remember the init state.
-     * This used to change the alternative content replace process.
+     *
+     * Used in alternative content replace process.
      *
      * @var boolean
      */
@@ -112,9 +113,9 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
      *  )
      * </code>
      *
-     * @param \Symfony\Component\Templating\EngineInterface  $templating
-     * @param array|\Swift_Plugins_Decorator_Replacements    $replacements
-     * @param array                                          $templates
+     * @param TemplateInterface                           $templating
+     * @param array|\Swift_Plugins_Decorator_Replacements $replacements
+     * @param array                                       $templates
      *
      * @throws \InvalidArgumentException When the template file-names are invalid
      *
