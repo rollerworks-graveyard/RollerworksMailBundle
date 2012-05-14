@@ -22,14 +22,15 @@
             <directory>./</directory>
             <exclude>
                 <directory>./Resources</directory>
-                <directory>./Tests</directory>
+                <directory>./Tests/Fixtures</directory>
+                <directory>./Tests/TwigCache</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>
 
-	<php>
-		<ini name="mbstring.internal_encoding" value="UTF-8"/>
-	</php>
+    <php>
+        <ini name="mbstring.internal_encoding" value="UTF-8"/>
+    </php>
 
 </phpunit>

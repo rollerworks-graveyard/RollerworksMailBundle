@@ -12,7 +12,6 @@
 namespace Rollerworks\MailBundle\Decorator;
 
 use Symfony\Component\Templating\EngineInterface as TemplateInterface;
-use \InvalidArgumentException;
 
 /**
  * Handle e-mail messages using the Template engine.
@@ -124,7 +123,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
     public function __construct(TemplateInterface $templating, $replacements, array $templates)
     {
         if (!isset($templates['html']) && !isset($templates['text'])) {
-            throw new InvalidArgumentException('$templates must contain either html and/or text');
+            throw new \InvalidArgumentException('$templates must contain either html and/or text');
         }
 
         if (empty($templates['text']) || false === $templates['text']) {

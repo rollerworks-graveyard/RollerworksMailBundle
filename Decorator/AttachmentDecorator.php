@@ -11,8 +11,6 @@
 
 namespace Rollerworks\MailBundle\Decorator;
 
-use Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements;
-
 /**
  * Handle e-mail messages attachments using the Decorator pattern.
  *
@@ -20,7 +18,7 @@ use Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements;
  *
  * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  */
-class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements
+class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_Replacements
 {
     /**
      * The replacement map
@@ -69,7 +67,7 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
      */
     public function __construct($replacements)
     {
-        if (!$replacements instanceof Swift_Plugins_Decorator_Replacements) {
+        if (!$replacements instanceof \Swift_Plugins_Decorator_Replacements) {
             $replacements = (array) $replacements;
         }
         $this->replacements = $replacements;
@@ -145,7 +143,7 @@ class AttachmentDecorator implements Swift_Events_SendListener, Swift_Plugins_De
      */
     public function getReplacementsFor($address)
     {
-        if ($this->replacements instanceof Swift_Plugins_Decorator_Replacements) {
+        if ($this->replacements instanceof \Swift_Plugins_Decorator_Replacements) {
             return $this->replacements->getReplacementsFor($address);
         }
         else {

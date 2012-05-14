@@ -12,7 +12,6 @@
 namespace Rollerworks\MailBundle\Tests;
 
 use Rollerworks\MailBundle\Decorator\TemplateDecorator;
-use \Swift_MailTransport, \Swift_Mailer, \Swift_Events_SendEvent, \Swift_Message, \Swift_Attachment, \Swift_Mime_MimeEntity;
 
 class MailTemplateTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,12 +20,12 @@ class MailTemplateTest extends \PHPUnit_Framework_TestCase
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
             ->setFrom(array('john@doe.com' => 'John Doe'))
             ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
                               'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
@@ -63,12 +62,12 @@ Rollerscapes', trim($message->getBody()));
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
             ->setFrom(array('john@doe.com' => 'John Doe'))
             ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
                               'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
@@ -103,12 +102,12 @@ Rollerscapes-', $child->getBody());
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
             ->setFrom(array('john@doe.com' => 'John Doe'))
             ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
                               'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
 
@@ -132,12 +131,12 @@ Rollerscapes-', $child->getBody());
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Message for {name}')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Message for {name}')
             ->setFrom(array('john@doe.com' => 'John Doe'))
             ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'   => array('name'     => 'John',  'gender'   => 'Sir',
                                                                  '_subject' => array('{name}' => 'SJohn')),
                               'webmaster@example.com'   => array('name'     => 'Piet',  'gender'   => 'Heer',
@@ -180,12 +179,12 @@ Rollerscapes', trim($message->getBody()));
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
             ->setFrom(array('john@doe.com' => 'John Doe'))
             ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
                                                                    'gender' => 'Sir',
                                                                    'date'   => '2010-08-25 15:28',
@@ -229,12 +228,12 @@ Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
             ->setFrom(array('john@doe.com' => 'John Doe'))
             ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
                                                                    'gender' => 'Sir',
                                                                    'date'   => '2010-08-25 15:28',
@@ -265,7 +264,7 @@ Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($mes
             $children = (array) $message->getChildren();
 
             foreach ($children as $child) {
-                if ('text/plain' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
+                if ('text/plain' == $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
                     $this->fail('This must not exist.');
                 }
             }
@@ -278,14 +277,14 @@ Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($mes
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
                 ->setFrom(array('john@doe.com' => 'John Doe'))
                 ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $message->attach(Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
+        $message->attach(\Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
 
-        $sendEvent = new Swift_Events_SendEvent($transport, $message);
+        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
                                                                    'gender' => 'Sir',
                                                                    'date'   => '2010-08-25 15:28',
@@ -316,10 +315,10 @@ Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
             $children = (array) $message->getChildren();
 
             foreach ($children as $child) {
-                if ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
+                if ('text/html' == $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
                     $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Currentdate: ' . $msgReplacements['date2'] . '</p>', $child->getBody());
                 }
-                elseif ('text/html' == $child->getContentType() && Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                elseif ('text/html' == $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
                     $headers = $child->getHeaders();
 
                     if ($headers->has('Content-Disposition')) {
@@ -346,14 +345,14 @@ IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
     {
         $templating = $this->getTwigInstance();
 
-        $transport = Swift_MailTransport::newInstance();
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $transport = \Swift_MailTransport::newInstance();
+        $message = \Swift_Message::newInstance('Wonderful Subject')
                 ->setFrom(array('john@doe.com' => 'John Doe'))
                 ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
 
-        $message->attach(Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
+        $message->attach(\Swift_Attachment::fromPath(__DIR__ . '/Fixtures/TestMsg2.twig', 'text/html'));
 
-        //$sendEvent = new Swift_Events_SendEvent($transport, $message);
+        //$sendEvent = new \Swift_Events_SendEvent($transport, $message);
         $replacements = array('info@rollerscapes.net'     => array('name'   => 'John',
                                                                    'gender' => 'Sir',
                                                                    'date'   => '2010-08-25 15:28',
