@@ -22,7 +22,6 @@
             <directory>./</directory>
             <exclude>
                 <directory>./Tests</directory>
-                <directory>./Resources</directory>
                 <directory>./Tests/Fixtures</directory>
                 <directory>./Tests/TwigCache</directory>
                 <directory>./vendor</directory>

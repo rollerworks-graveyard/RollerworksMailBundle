@@ -17,13 +17,12 @@ nbproject
 *.sublime-project
 *.sublime-workspace
 
-# Komodo
-*.komodoproject
-.komodotools
-
 # Folders to ignore
+/vendor/
+/Tests/TwigCache
 .idea
 
-/clover.xml
-/phpunit.xml
-/Tests/TwigCache
+phpunit.xml
+composer.lock
+composer.phar
+autoload.php
