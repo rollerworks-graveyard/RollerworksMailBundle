@@ -109,7 +109,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
      * Example:
      * <code>
      *  $templates = array(
-     *      'html' => 'AcmeHelloBundle:Email:Order.html.twig'
+     *      'html' => 'AcmeHelloBundle:Email:Order.html.twig',
      *      'text' => 'AcmeHelloBundle:Email:Order.txt.twig'
      *  )
      * </code>

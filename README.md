@@ -1,4 +1,4 @@
-﻿[RollerworksMailBundle]
+RollerworksMailBundle
 =======================
 
 This bundle provides Templating and Attachment Decorating for SwiftMailer with Symfony
@@ -148,12 +148,70 @@ $bundles = array(
 
 Congratulations! You're ready!
 
-## Basic Usage
+## Basic Usage (Template decorator)
 
-TODO. Sorry.
+___See http://swiftmailer.org/docs/plugins.html#decorator-plugin for more in-dept details.___
 
-Usage is similar to http://swiftmailer.org/docs/plugins.html#decorator-plugin
+When creating an new e-mail message add the following.
 
-Just replace Swift_Plugins_DecoratorPlugin with \Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator
+``` php
+<?php
 
-See \Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator#__construct() for more details.
+// Replacements must be an array or implementation of \Swift_Plugins_Decorator_Replacements
+// Each key is an e-mailadres and the value an array that is directly passed to render() of the templating engine.
+
+$replacements = array(
+    "address1@domain.tld" => array("a" => "b", "c" => "d"),
+    "address2@domain.tld" => array("a" => "x", "c" => "y")
+);
+
+// Template filename follows the Symfony template resolving convention ([Bundle]:[Dir]:[filename].[type].[ext]).
+$templates = array(
+    'html' => 'AcmeHelloBundle:Email:Order.html.twig',
+    'text' => 'AcmeHelloBundle:Email:Order.txt.twig'
+);
+
+$templating = $container->get('templating');
+
+$decorator = new \Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator($templating, $replacements, $templates);
+$mailer->registerPlugin($decorator);
+```
+
+## Basic Usage (Attachment decorator)
+
+___This can be used in combination with the Template decorator.___
+
+Also see:
+
+* http://swiftmailer.org/docs/plugins.html#decorator-plugin
+* http://swiftmailer.org/docs/messages.html#attaching-files
+
+For more in-dept detail.
+
+When creating an new e-mail message add the following.
+
+Replacements must be an array or implementation of \Swift_Plugins_Decorator_Replacements
+Each key is an e-mailadres and the value an array with attachments.
+An attachment is either a \Swift_Attachment object or an array with the following keys and data:
+
+``` php
+ array('data'     => 'raw-file-content',
+       'filename' => 'some-file.txt',
+       'type'     => 'optional mime-type')
+```
+
+***Note: data must not be base64 encoded but provided as-is.***
+
+``` php
+<?php
+
+$replacements = array(
+    "address1@domain.tld" => array(new \Swift_Attachment::fromPath('/path/to/image.jpg', 'image/jpeg')),
+    "address2@domain.tld" => array(array('data' => 'Please read me...', 'filename' => 'agreement.txt', 'type' => 'text/plain'))
+);
+
+$decorator = new \Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator($replacements);
+$mailer->registerPlugin($decorator);
+```
+
+
