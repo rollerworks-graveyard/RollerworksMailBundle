@@ -1,67 +1,133 @@
-﻿[RollerworksMailBundle](http://projects.rollerscapes.net/RollerFramework/)
-==================================================
+﻿[RollerworksMailBundle]
+=======================
 
-This bundle provides the RollerworksMailBundle, providing Templating and AttachmentDecorating for SwiftMailer 
+This bundle provides Templating and Attachment Decorating for SwiftMailer with Symfony
 
 ### Template
 
-SwiftMailer template decorator.
-Handles e-mail messages using the Templating engine.
+The SwiftMailer template decorator, handles e-mail messages using the Symfony Templating Component.
 
 ### AttachmentDecorator
 
-SwiftMailer attachment decorator.
-Similar to Mail:Template, but instead it handles attachments.
+The SwiftMailer attachment decorator is similar to Template decorator, but instead it handles attachments.
 
 ## Installation
 
-Installation depends on how your project is setup:
+### Step 1: Using Composer (recommended)
 
-### Step 1: Installation using the `bin/vendors.php` method
+To install RollerworksMailBundle with Composer just add the following to your
+`composer.json` file:
 
-If you're using the `bin/vendors.php` method to manage your vendor libraries,
-add the following entry to the `deps` in the root of your project file:
-
+```js
+// composer.json
+{
+    // ...
+    require: {
+        // ...
+        "rollerworks/mail-bundle": "master-dev"
+    }
+}
 ```
+
+**NOTE**: Please replace `master-dev` in the snippet above with the latest stable
+branch, for example ``2.0.*``.
+
+Then, you can install the new dependencies by running Composer's ``update``
+command from the directory where your ``composer.json`` file is located:
+
+```bash
+$ php composer.phar update
+```
+
+Now, Composer will automatically download all required files, and install them
+for you. All that is left to do is to update your ``AppKernel.php`` file, and
+register the new bundle:
+
+```php
+<?php
+
+// in AppKernel::registerBundles()
+$bundles = array(
+    // ...
+    new Rollerworks\Bundle\MailBundle\RollerworksMailBundle(),
+    // ...
+);
+```
+
+### Step 1 (alternative): Using ``deps`` file (Symfony 2.0.x)
+
+First, checkout a copy of the code. Just add the following to the ``deps``
+file of your Symfony Standard Distribution:
+
+```ini
 [RollerworksMailBundle]
-    git=https://github.com/Rollerscapes/RollerworksMailBundle.git
-    target=/vendor/bundles/Rollerworks/MailBundle
+    git=http://github.com/rollerscapes/RollerworksMailBundle.git
+    target=/bundles/Rollerworks/Bundle/MailBundle
 ```
 
-Next, update your vendors by running:
+**NOTE**: You can add `version` tag in the snippet above with the latest stable
+branch, for example ``version=origin/2.0``.
 
-```bash
-$ ./bin/vendors
+Then register the bundle with your kernel:
+
+```php
+<?php
+
+// in AppKernel::registerBundles()
+$bundles = array(
+    // ...
+    new Rollerworks\Bundle\MailBundle\RollerworksMailBundle(),
+    // ...
+);
 ```
 
-Great! Now skip down to *Step 2*.
+Make sure that you also register the namespace with the autoloader:
 
-### Step 1 (alternative): Installation with sub-modules
+```php
+<?php
 
-If you're managing your vendor libraries with sub-modules, first create the
-`vendor/bundles/Rollerworks/MailBundle` directory:
-
-```bash
-$ mkdir -pv vendor/bundles/Rollerworks/MailBundle
+// app/autoload.php
+$loader->registerNamespaces(array(
+    // ...
+    'Rollerworks'              => __DIR__.'/../vendor/bundles',
+    // ...
+));
 ```
 
-Next, add the necessary sub-module:
+Now use the ``vendors`` script to clone the newly added repositories
+into your project:
 
 ```bash
-$ git submodule add https://github.com/Rollerscapes/RollerworksMailBundle.git vendor/bundles/Rollerworks/MailBundle
+$ php bin/vendors install
+```
+
+### Step 1 (alternative): Using submodules (Symfony 2.0.x)
+
+If you're managing your vendor libraries with submodules, first create the
+`vendor/bundles/Rollerworks/Bundle` directory:
+
+``` bash
+$ mkdir -pv vendor/bundles/Rollerworks/Bundle
+```
+
+Next, add the necessary submodule:
+
+``` bash
+$ git submodule add git://github.com/rollerscapes/RollerworksMailBundle.git vendor/bundles/Rollerworks/Bundle/MailBundle
 ```
 
 ### Step2: Configure the autoloader
 
 Add the following entry to your autoloader:
 
-```php
+``` php
 <?php
 // app/autoload.php
 
 $loader->registerNamespaces(array(
     // ...
-    'Rollerworks' => __DIR__.'/../vendor/bundles',
+    'Rollerworks'              => __DIR__.'/../vendor/bundles',
+    // ...
 ));
 ```
 
@@ -69,19 +135,25 @@ $loader->registerNamespaces(array(
 
 Finally, enable the bundle in the kernel:
 
-```php
+``` php
 <?php
-// app/AppKernel.php
 
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Rollerworks\MailBundle\RollerworksMailBundle(),
-    );
-}
+// in AppKernel::registerBundles()
+$bundles = array(
+    // ...
+    new Rollerworks\Bundle\MailBundle\RollerworksMailBundle(),
+    // ...
+);
 ```
 
-### Step4: Configure the bundle
+Congratulations! You're ready!
 
-Nothing needs to be configured, just use the decorators when creating an new e-mail message.
+## Basic Usage
+
+TODO. Sorry.
+
+Usage is similar to http://swiftmailer.org/docs/plugins.html#decorator-plugin
+
+Just replace Swift_Plugins_DecoratorPlugin with \Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator
+
+See \Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator#__construct() for more details.
