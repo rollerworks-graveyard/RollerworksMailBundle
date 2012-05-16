@@ -12,6 +12,7 @@
     ],
     "require":    {
         "php": ">=5.3.3",
+				"twig/extensions": "dev-master",
         "symfony/framework-bundle": "2.*",
         "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev"
     },
