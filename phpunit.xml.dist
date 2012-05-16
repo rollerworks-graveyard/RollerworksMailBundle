@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="Tests/Bootstrap.php"
+         bootstrap="Tests/bootstrap.php"
 >
     <testsuites>
         <testsuite name="RollerworksMailBundle Test Suite">
