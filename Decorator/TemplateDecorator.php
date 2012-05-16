@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Rollerworks\MailBundle\Decorator;
+namespace Rollerworks\Bundle\MailBundle\Decorator;
 
 use Symfony\Component\Templating\EngineInterface as TemplateInterface;
 
@@ -17,6 +17,8 @@ use Symfony\Component\Templating\EngineInterface as TemplateInterface;
  * Handle e-mail messages using the Template engine.
  *
  * For use with SwiftMailerBundle
+ *
+ * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  */
 class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_Replacements
 {

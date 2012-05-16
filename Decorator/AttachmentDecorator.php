@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Rollerworks\MailBundle\Decorator;
+namespace Rollerworks\Bundle\MailBundle\Decorator;
 
 /**
  * Handle e-mail messages attachments using the Decorator pattern.

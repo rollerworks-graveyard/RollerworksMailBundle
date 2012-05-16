@@ -4,7 +4,7 @@
  * This an direct copy of the Symfony\Bundle\TwigBundle\TwigEngine but without the dependency hell for testing
  */
 
-namespace Rollerworks\MailBundle\Tests;
+namespace Rollerworks\Bundle\MailBundle\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Response;

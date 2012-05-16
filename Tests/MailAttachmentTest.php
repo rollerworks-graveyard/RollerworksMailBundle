@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Rollerworks\MailBundle\Tests;
+namespace Rollerworks\Bundle\MailBundle\Tests;
 
-use Rollerworks\MailBundle\Decorator\TemplateDecorator;
-use Rollerworks\MailBundle\Decorator\AttachmentDecorator;
+use Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator;
+use Rollerworks\Bundle\MailBundle\Decorator\AttachmentDecorator;
 
 class AttachmentTest extends \PHPUnit_Framework_TestCase
 {

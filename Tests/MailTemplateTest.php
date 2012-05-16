@@ -9,55 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Rollerworks\MailBundle\Tests;
+namespace Rollerworks\Bundle\MailBundle\Tests;
 
-use Rollerworks\MailBundle\Decorator\TemplateDecorator;
+use Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator;
 
 class MailTemplateTest extends \PHPUnit_Framework_TestCase
 {
-    /*
-    function testSimpleReplace()
-    {
-        $templating = $this->getTwigInstance();
-
-        $transport = \Swift_MailTransport::newInstance();
-        $message = \Swift_Message::newInstance('Wonderful Subject')
-            ->setFrom(array('john@doe.com' => 'John Doe'))
-            ->setTo(array('info@rollerscapes.net', 'webmaster@example.com'));
-
-        $sendEvent = new \Swift_Events_SendEvent($transport, $message);
-        $replacements = array('info@rollerscapes.net'   => array('name'   => 'John',  'gender' => 'Sir'),
-                              'webmaster@example.com'   => array('name'   => 'Piet',  'gender' => 'Heer'));
-
-        $mailDecorator = new Template($templating, $replacements, array('html' => 'TestMsg1.twig' ));
-
-        foreach ($replacements as $sEmail => $replacements) {
-            $sendEvent->getMessage()->setTo($sEmail);
-
-            $mailDecorator->beforeSendPerformed($sendEvent);
-
-            $message = $sendEvent->getMessage();
-            $this->assertEquals('Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',
-
-Dit is een testbericht.
-
-This an test message.
-
-Rollerscapes', trim($message->getBody()));
-
-            $children = (array) $message->getChildren();
-
-            foreach ($children as $child) {
-                if ('text/html' == $child->getContentType()) {
-                    $this->assertEquals('<p>Geachte ' . $replacements['gender'] . ' ' . $replacements['name'] . ',</p><p>Dit is een testbericht.</p><p>This an test message.</p><p>Rollerscapes</p>', $child->getBody());
-                }
-            }
-
-            $mailDecorator->sendPerformed($sendEvent);
-        }
-    }
-    */
-
     function testHTMLAndText()
     {
         $templating = $this->getTwigInstance();
@@ -153,16 +110,6 @@ Rollerscapes-', $child->getBody());
 
             $this->assertEquals('Message for ' . $msgReplacements['_subject']['{name}'], $message->getSubject());
 
-            /*
-            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
-
-Dit is een testbericht.
-
-This an test message.
-
-Rollerscapes', trim($message->getBody()));
-            */
-
             $children = (array) $message->getChildren();
 
             foreach ($children as $child) {
@@ -205,12 +152,6 @@ Rollerscapes', trim($message->getBody()));
             $mailDecorator->beforeSendPerformed($sendEvent);
 
             $message = $sendEvent->getMessage();
-
-            /*
-            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
-
-Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
-            */
 
             $children = (array) $message->getChildren();
 
@@ -305,12 +246,6 @@ Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($mes
             $mailDecorator->beforeSendPerformed($sendEvent);
 
             $message = $sendEvent->getMessage();
-
-            /*
-            $this->assertEquals('Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',
-
-Currentdate: ' . $msgReplacements['date2'] . '', $message->getBody());
-            */
 
             $children = (array) $message->getChildren();
 
