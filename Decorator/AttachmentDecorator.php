@@ -145,8 +145,7 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
     {
         if ($this->replacements instanceof \Swift_Plugins_Decorator_Replacements) {
             return $this->replacements->getReplacementsFor($address);
-        }
-        else {
+        } else {
             return isset($this->replacements[$address]) ? $this->replacements[$address] : null;
         }
     }

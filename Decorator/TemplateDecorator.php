@@ -184,8 +184,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
             if (!isset($this->templates['html']) && isset($this->templates['text'])) {
                 $messageBodyText = $this->templating->render($this->templates['text'], $replacements);
                 $message->setBody($messageBodyText, 'text/plain');
-            }
-            else {
+            } else {
                 $messageBodyHtml = $this->templating->render($this->templates['html'], $replacements);
                 if (isset($this->templates['text'])) {
                     $messageBodyText = $this->templating->render($this->templates['text'], $replacements);
@@ -199,8 +198,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                     if (false === $this->isInit) {
                         $message->addPart($messageBodyText, 'text/plain');
                         $this->isInit = true;
-                    }
-                    else {
+                    } else {
                         /** @var $child \Swift_Mime_MimeEntity */
                         foreach ($message->getChildren() as $child) {
                             // We are only interested in the 'alternative' text version (not any attached ones)
@@ -241,8 +239,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
     {
         if ($this->replacements instanceof \Swift_Plugins_Decorator_Replacements) {
             return $this->replacements->getReplacementsFor($address);
-        }
-        else {
+        } else {
             return isset($this->replacements[$address]) ? $this->replacements[$address] : null;
         }
     }

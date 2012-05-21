@@ -252,8 +252,7 @@ Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($mes
             foreach ($children as $child) {
                 if ('text/html' == $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE === $child->getNestingLevel()) {
                     $this->assertEquals('<p>Geachte ' . $msgReplacements['gender'] . ' ' . $msgReplacements['name'] . ',</p><p>Currentdate: ' . $msgReplacements['date2'] . '</p>', $child->getBody());
-                }
-                elseif ('text/html' == $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
+                } elseif ('text/html' == $child->getContentType() && \Swift_Mime_MimeEntity::LEVEL_MIXED === $child->getNestingLevel()) {
                     $headers = $child->getHeaders();
 
                     if ($headers->has('Content-Disposition')) {

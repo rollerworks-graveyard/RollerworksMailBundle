@@ -1,6 +1,6 @@
 <?php
 
-return Symfony\Component\Finder\Finder::create()
+$finder = Symfony\CS\Finder\DefaultFinder::create()
     ->name('*.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true)
@@ -9,3 +9,7 @@ return Symfony\Component\Finder\Finder::create()
     ->exclude('Tests/Fixtures')
     ->in(__DIR__)
     ;
+
+return Symfony\CS\Config\Config::create()
+    ->finder($finder)
+;
