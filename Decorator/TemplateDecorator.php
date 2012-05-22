@@ -138,6 +138,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
         if (!$replacements instanceof \Swift_Plugins_Decorator_Replacements) {
             $replacements = (array) $replacements;
         }
+
         $this->replacements = $replacements;
     }
 
@@ -186,6 +187,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                 $message->setBody($messageBodyText, 'text/plain');
             } else {
                 $messageBodyHtml = $this->templating->render($this->templates['html'], $replacements);
+
                 if (isset($this->templates['text'])) {
                     $messageBodyText = $this->templating->render($this->templates['text'], $replacements);
                 }
@@ -211,6 +213,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                     }
                 }
             }
+
             $this->lastMessage = $message;
         }
     }
@@ -233,6 +236,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
      * If no replacements can be found, an empty value (NULL) is returned.
      *
      * @param string $address
+     *
      * @return array
      */
     public function getReplacementsFor($address)
@@ -256,6 +260,7 @@ class TemplateDecorator implements \Swift_Events_SendListener, \Swift_Plugins_De
                 $message->setSubject($this->originalSubject);
                 $this->originalSubject = null;
             }
+
             $this->lastMessage = null;
         }
     }

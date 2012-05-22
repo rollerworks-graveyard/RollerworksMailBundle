@@ -21,7 +21,7 @@ namespace Rollerworks\Bundle\MailBundle\Decorator;
 class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_Decorator_Replacements
 {
     /**
-     * The replacement map
+     * The replacement map.
      *
      * @var \Swift_Plugins_Decorator_Replacements|array
      */
@@ -70,6 +70,7 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
         if (!$replacements instanceof \Swift_Plugins_Decorator_Replacements) {
             $replacements = (array) $replacements;
         }
+
         $this->replacements = $replacements;
     }
 
@@ -97,8 +98,10 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
                     if (!isset($attachment['type'])) {
                         $attachment['type'] = null;
                     }
+
                     $attachment = \Swift_Attachment::newInstance($attachment['data'], $attachment['filename'], $attachment['type']);
                 }
+
                 $this->attachments[] = $attachment;
                 $message->attach($attachment);
             }
@@ -119,7 +122,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
 
     /**
      * Returns the attachments registered after beforeSendPerformed() was called.
-     * This intended for debugging purposes only.
      *
      * @return \Swift_Attachment[]
      */
@@ -131,12 +133,14 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
 
     /**
      * Find a map of replacements for the address.
+     *
      * If this plug-in was provided with a delegate instance of {@link Swift_Plugins_Decorator_Replacements} then the call will be delegated to it.
      * Otherwise, it will attempt to find the replacements from the array provided in the constructor.
      *
      * If no replacements can be found, an empty value (NULL) is returned.
      *
      * @param string $address
+     *
      * @return array
      *
      * @api
@@ -161,6 +165,7 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
             foreach ($this->attachments as $attachment) {
                 $message->detach($attachment);
             }
+
             $this->attachments = array();
         }
     }
