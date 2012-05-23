@@ -179,20 +179,20 @@ Rollerscapes-', $child->getBody());
                                                                    'gender' => 'Sir',
                                                                    'date'   => '2010-08-25 15:28',
                                                                    'lang'   => 'en',
-                                                                   'date2'  => 'Wednesday, August 25, 2010 3:28:00 PM Central European Summer Time'),
+                                                                   'date2'  => 'Wednesday, August 25, 2010 3:28:00 PM'),
 
                               'webmaster@example.com'     => array('name'   => 'Piet',
                                                                    'gender' => 'Heer',
                                                                    'date'   => '2010-08-25 14:28',
                                                                    'lang'   => 'nl',
-                                                                   'date2'  => 'woensdag 25 augustus 2010 14:28:00 Midden-Europese zomertijd'));
+                                                                   'date2'  => 'woensdag 25 augustus 2010 14:28:00'));
 
         $mailDecorator = new TemplateDecorator($templating, $replacements, array('text' => 'TestMsg3.twig' ));
 
         $this->assertTrue( $mailDecorator->isTextOnly() );
 
-        foreach ($replacements as $sEmail => $msgReplacements) {
-            $sendEvent->getMessage()->setTo($sEmail);
+        foreach ($replacements as $email => $msgReplacements) {
+            $sendEvent->getMessage()->setTo($email);
 
             $mailDecorator->beforeSendPerformed($sendEvent);
 
