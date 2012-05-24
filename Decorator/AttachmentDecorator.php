@@ -74,7 +74,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
         $this->replacements = $replacements;
     }
 
-
     /**
      * Invoked immediately before the Message is sent.
      *
@@ -108,7 +107,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
         }
     }
 
-
     /**
      * Invoked immediately after the Message is sent.
      *
@@ -119,7 +117,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
         $this->restoreMessage($sendEvent->getMessage());
     }
 
-
     /**
      * Returns the attachments registered after beforeSendPerformed() was called.
      *
@@ -129,7 +126,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
     {
         return $this->attachments;
     }
-
 
     /**
      * Find a map of replacements for the address.

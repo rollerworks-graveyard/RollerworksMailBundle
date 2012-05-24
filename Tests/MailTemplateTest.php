@@ -15,7 +15,7 @@ use Rollerworks\Bundle\MailBundle\Decorator\TemplateDecorator;
 
 class MailTemplateTest extends \PHPUnit_Framework_TestCase
 {
-    function testHTMLAndText()
+    public function testHTMLAndText()
     {
         $templating = $this->getTwigInstance();
 
@@ -55,7 +55,7 @@ Rollerscapes-', $child->getBody());
         }
     }
 
-    function testHTMLOnly()
+    public function testHTMLOnly()
     {
         $templating = $this->getTwigInstance();
 
@@ -84,7 +84,7 @@ Rollerscapes-', $child->getBody());
         }
     }
 
-    function testSubjectReplace()
+    public function testSubjectReplace()
     {
         $templating = $this->getTwigInstance();
 
@@ -122,7 +122,7 @@ Rollerscapes-', $child->getBody());
         }
     }
 
-    function testReplaceWithDate()
+    public function testReplaceWithDate()
     {
         $templating = $this->getTwigInstance();
 
@@ -165,7 +165,7 @@ Rollerscapes-', $child->getBody());
         }
     }
 
-    function testOnlyText()
+    public function testOnlyText()
     {
         $templating = $this->getTwigInstance();
 
@@ -214,7 +214,7 @@ Currentdate: ' . $msgReplacements['date2'] . '', str_replace("\r", '', trim($mes
         }
     }
 
-    function testAttachedHTML()
+    public function testAttachedHTML()
     {
         $templating = $this->getTwigInstance();
 
@@ -275,7 +275,7 @@ IGRhdGUgfCBsb2NhbGl6ZWRkYXRlKCAnZnVsbCcsICdzaG9ydCcsIGxhbmcgKSB9fTwvcD4=';
         }
     }
 
-    function testWrongInput()
+    public function testWrongInput()
     {
         $templating = $this->getTwigInstance();
 

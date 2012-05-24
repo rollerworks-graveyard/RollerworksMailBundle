@@ -15,7 +15,7 @@ use Rollerworks\Bundle\MailBundle\Decorator\AttachmentDecorator;
 
 class AttachmentTest extends \PHPUnit_Framework_TestCase
 {
-    function testSimpleReplace()
+    public function testSimpleReplace()
     {
         $transport = \Swift_MailTransport::newInstance();
         $message = \Swift_Message::newInstance('Wonderful Subject')
@@ -51,7 +51,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    function testKeepOriginal()
+    public function testKeepOriginal()
     {
         $transport = \Swift_MailTransport::newInstance();
         $message = \Swift_Message::newInstance('Wonderful Subject')
@@ -102,7 +102,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    function testMultiple()
+    public function testMultiple()
     {
         $transport = \Swift_MailTransport::newInstance();
         $message = \Swift_Message::newInstance('Wonderful Subject')
@@ -159,7 +159,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    function testMultiArray()
+    public function testMultiArray()
     {
         $transport = \Swift_MailTransport::newInstance();
         $message = \Swift_Message::newInstance('Wonderful Subject')
