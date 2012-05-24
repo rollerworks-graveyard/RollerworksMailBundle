@@ -1,5 +1,5 @@
 RollerworksMailBundle
-=======================
+=====================
 
 This bundle provides Templating and Attachment Decorating for SwiftMailer with Symfony
 
@@ -61,7 +61,7 @@ file of your Symfony Standard Distribution:
 
 ```ini
 [RollerworksMailBundle]
-    git=http://github.com/rollerscapes/RollerworksMailBundle.git
+    git=http://github.com/rollerworks/RollerworksMailBundle.git
     target=/bundles/Rollerworks/Bundle/MailBundle
 ```
 
@@ -113,7 +113,7 @@ $ mkdir -pv vendor/bundles/Rollerworks/Bundle
 Next, add the necessary submodule:
 
 ``` bash
-$ git submodule add git://github.com/rollerscapes/RollerworksMailBundle.git vendor/bundles/Rollerworks/Bundle/MailBundle
+$ git submodule add git://github.com/rollerworks/RollerworksMailBundle.git vendor/bundles/Rollerworks/Bundle/MailBundle
 ```
 
 ### Step2: Configure the autoloader
