@@ -1,7 +1,7 @@
 <?php
 
-/**
- * This file is part of the RollerworksMailBundle.
+/*
+ * This file is part of the RollerworksMailBundle package.
  *
  * (c) Sebastiaan Stok <s.stok@rollerscapes.net>
  *

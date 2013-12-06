@@ -4,10 +4,10 @@ $finder = Symfony\CS\Finder\DefaultFinder::create()
     ->name('*.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true)
+    ->in(__DIR__ . '/src')
+    ->in(__DIR__ . '/tests')
     ->exclude('vendor')
-    ->exclude('.temp') // this directory is only used local.
-    ->exclude('Tests/Fixtures')
-    ->in(__DIR__)
+    ->exclude('Fixtures')
     ;
 
 return Symfony\CS\Config\Config::create()

@@ -1,7 +1,7 @@
 <?php
 
-/**
- * This file is part of the RollerworksMailBundle.
+/*
+ * This file is part of the RollerworksMailBundle package.
  *
  * (c) Sebastiaan Stok <s.stok@rollerscapes.net>
  *
@@ -15,8 +15,6 @@ use Symfony\Component\Templating\EngineInterface as TemplateInterface;
 
 /**
  * Handle e-mail messages using the Template engine.
- *
- * For use with SwiftMailerBundle
  *
  * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  */

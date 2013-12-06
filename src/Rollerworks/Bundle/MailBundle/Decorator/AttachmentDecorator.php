@@ -1,7 +1,7 @@
 <?php
 
-/**
- * This file is part of the RollerworksMailBundle.
+/*
+ * This file is part of the RollerworksMailBundle package.
  *
  * (c) Sebastiaan Stok <s.stok@rollerscapes.net>
  *
@@ -13,8 +13,6 @@ namespace Rollerworks\Bundle\MailBundle\Decorator;
 
 /**
  * Handle e-mail messages attachments using the Decorator pattern.
- *
- * For use with SwiftMailerBundle
  *
  * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  */
@@ -62,8 +60,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
      * given to {@see \Swift_Plugins_Decorator_Replacements::getReplacementsFor()}.
      *
      * @param \Swift_Plugins_Decorator_Replacements|Array $replacements
-     *
-     * @api
      */
     public function __construct($replacements)
     {
@@ -79,8 +75,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
      *
      * @param \Swift_Events_SendEvent $sendEvent
      * @param \Swift_Events_SendEvent $sendEvent
-     *
-     * @api
      */
     public function beforeSendPerformed(\Swift_Events_SendEvent $sendEvent)
     {
@@ -138,8 +132,6 @@ class AttachmentDecorator implements \Swift_Events_SendListener, \Swift_Plugins_
      * @param string $address
      *
      * @return array
-     *
-     * @api
      */
     public function getReplacementsFor($address)
     {

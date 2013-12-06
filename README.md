@@ -1,7 +1,7 @@
 RollerworksMailBundle
 =====================
 
-This bundle provides Templating and Attachment Decorating for SwiftMailer with Symfony
+This bundle provides Templating and Attachment Decorating for SwiftMailer with Symfony2
 
 ### Template
 
@@ -9,7 +9,8 @@ The SwiftMailer template decorator, handles e-mail messages using the Symfony T
 
 ### AttachmentDecorator
 
-The SwiftMailer attachment decorator is similar to Template decorator, but instead it handles attachments.
+The SwiftMailer attachment decorator is similar to the Template decorator,
+but instead it handles mail attachments.
 
 ## Installation
 
@@ -30,7 +31,7 @@ To install RollerworksMailBundle with Composer just add the following to your
 ```
 
 **NOTE**: Please replace `master-dev` in the snippet above with the latest stable
-branch, for example ``2.0.*``.
+branch, for example ``1.0.*``.
 
 Then, you can install the new dependencies by running Composer's ``update``
 command from the directory where your ``composer.json`` file is located:
@@ -66,7 +67,7 @@ file of your Symfony Standard Distribution:
 ```
 
 **NOTE**: You can add `version` tag in the snippet above with the latest stable
-branch, for example ``version=origin/2.0``.
+branch, for example ``version=origin/1.0``.
 
 Then register the bundle with your kernel:
 
@@ -89,7 +90,7 @@ Make sure that you also register the namespace with the autoloader:
 // app/autoload.php
 $loader->registerNamespaces(array(
     // ...
-    'Rollerworks'              => __DIR__.'/../vendor/bundles',
+    'Rollerworks' => __DIR__.'/../vendor/bundles',
     // ...
 ));
 ```
@@ -99,36 +100,6 @@ into your project:
 
 ```bash
 $ php bin/vendors install
-```
-
-### Step 1 (alternative): Using submodules (Symfony 2.0.x)
-
-If you're managing your vendor libraries with submodules, first create the
-`vendor/bundles/Rollerworks/Bundle` directory:
-
-``` bash
-$ mkdir -pv vendor/bundles/Rollerworks/Bundle
-```
-
-Next, add the necessary submodule:
-
-``` bash
-$ git submodule add git://github.com/rollerworks/RollerworksMailBundle.git vendor/bundles/Rollerworks/Bundle/MailBundle
-```
-
-### Step2: Configure the autoloader
-
-Add the following entry to your autoloader:
-
-``` php
-<?php
-// app/autoload.php
-
-$loader->registerNamespaces(array(
-    // ...
-    'Rollerworks'              => __DIR__.'/../vendor/bundles',
-    // ...
-));
 ```
 
 ### Step3: Enable the bundle
@@ -158,7 +129,7 @@ When creating an new e-mail message add the following.
 <?php
 
 // Replacements must be an array or implementation of \Swift_Plugins_Decorator_Replacements
-// Each key is an e-mailadres and the value an array that is directly passed to render() of the templating engine.
+// Each key is an e-mail address and the value an array that is directly passed to render() of the templating engine.
 
 $replacements = array(
     "address1@domain.tld" => array("a" => "b", "c" => "d"),
@@ -179,7 +150,7 @@ $mailer->registerPlugin($decorator);
 
 ## Basic Usage (Attachment decorator)
 
-___This can be used in combination with the Template decorator.___
+**Note.** This can be used in combination with the Template decorator.
 
 Also see:
 
@@ -191,10 +162,10 @@ For more in-dept detail.
 When creating an new e-mail message add the following.
 
 Replacements must be an array or implementation of \Swift_Plugins_Decorator_Replacements
-Each key is an e-mailadres and the value an array with attachments.
+Each key is an e-mail address and the value an array with attachments.
 An attachment is either a \Swift_Attachment object or an array with the following keys and data:
 
-``` php
+```php
  array('data'     => 'raw-file-content',
        'filename' => 'some-file.txt',
        'type'     => 'optional mime-type')
@@ -202,7 +173,7 @@ An attachment is either a \Swift_Attachment object or an array with the followin
 
 ***Note: data must not be base64 encoded but provided as-is.***
 
-``` php
+```php
 <?php
 
 $replacements = array(
